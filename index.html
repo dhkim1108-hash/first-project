@@ -1,221 +1,321 @@
-
 <!DOCTYPE html>
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>분실물 센터 / 통합 게시판</title>
+    <title>몽글몽글 분실물 센터 🐾</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Google Fonts: Gaegu & Nunito/Pretendard -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&family=Gowun+Dodum&family=Nunito:wght@600;800;900&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        cream: '#FFFDF9',
+                        peach: { 50: '#FFF5F3', 100: '#FFE8E5', 200: '#FFD3CD', 400: '#FF8E80', 500: '#FF6B5B' },
+                        mint: { 50: '#F0FDF8', 100: '#DCFCE7', 300: '#86EFAC', 500: '#34D399', 600: '#10B981' },
+                        butter: { 100: '#FEF9C3', 300: '#FDE047', 400: '#FACC15' },
+                        lavender: { 100: '#F3E8FF', 200: '#E9D5FF', 400: '#C084FC', 500: '#A855F7' }
+                    },
+                    fontFamily: {
+                        cute: ['Gaegu', 'cursive'],
+                        body: ['Gowun Dodum', 'sans-serif'],
+                        num: ['Nunito', 'sans-serif']
+                    },
+                    borderRadius: {
+                        '3xl': '1.8rem',
+                        '4xl': '2.4rem'
+                    }
+                }
+            }
+        }
+    </script>
+
     <style>
         body {
-            font-family: 'Pretendard', sans-serif;
-            background-color: #f8fafc;
+            font-family: 'Gowun Dodum', sans-serif;
+            background-color: #FFFDF9;
+            background-image: radial-gradient(#F3E8FF 1px, transparent 1px), radial-gradient(#FFE8E5 1px, #FFFDF9 1px);
+            background-size: 40px 40px;
+            background-position: 0 0, 20px 20px;
         }
-        /* Custom scrollbar for comments and clean look */
+
+        /* Cute Bouncy Hover Animations */
+        .bounce-hover {
+            transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s ease;
+        }
+        .bounce-hover:hover {
+            transform: translateY(-5px) scale(1.02);
+        }
+
+        .bounce-click:active {
+            transform: scale(0.95);
+        }
+
+        /* Floating Animation for Mascot */
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-10px) rotate(2deg); }
+        }
+        .animate-float {
+            animation: float 3.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse-subtle {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        .animate-pulse-subtle {
+            animation: pulse-subtle 2s ease-in-out infinite;
+        }
+
+        /* Custom Scrollbar */
         ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
+            width: 8px;
+            height: 8px;
         }
         ::-webkit-scrollbar-track {
-            background: #f1f5f9;
+            background: #FFFDF9;
         }
         ::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 9999px;
+            background: #FFD3CD;
+            border-radius: 99px;
         }
         ::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8;
+            background: #FF8E80;
+        }
+
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
         }
     </style>
 </head>
-<body class="text-slate-800 min-h-screen flex flex-col">
 
-    <!-- Header -->
-    <header class="sticky top-0 z-30 bg-white/90 backdrop-blur-md border-b border-slate-200 shadow-sm">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between h-16 gap-4">
-                <!-- Logo -->
+<body class="text-slate-700 min-h-screen flex flex-col justify-between selection:bg-peach-200">
+
+    <!-- Header Area -->
+    <header class="sticky top-0 z-30 bg-white/85 backdrop-blur-md border-b-2 border-peach-100 shadow-sm">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5">
+            <div class="flex items-center justify-between gap-3">
+                
+                <!-- Logo & Mascot -->
                 <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center text-white font-bold text-xl shadow-md shadow-indigo-200">
-                        <i data-lucide="search-check" class="w-6 h-6"></i>
+                    <div class="w-12 h-12 rounded-3xl bg-peach-100 border-2 border-peach-200 flex items-center justify-center text-peach-500 shadow-inner animate-float">
+                        <span class="text-2xl">🐾</span>
                     </div>
                     <div>
-                        <h1 class="text-lg font-bold leading-tight text-slate-900">스마트 분실물 센터</h1>
-                        <p class="text-xs text-slate-500 hidden sm:block">소중한 물건을 빠르게 찾아드립니다</p>
+                        <div class="flex items-center gap-1.5">
+                            <h1 class="text-xl sm:text-2xl font-bold font-cute text-slate-800 tracking-wide">몽글몽글 분실물 센터</h1>
+                            <span class="px-2 py-0.5 text-[10px] font-bold bg-peach-100 text-peach-500 rounded-full border border-peach-200">Ver 2.0 ✨</span>
+                        </div>
+                        <p class="text-xs text-slate-400 hidden sm:block">소중한 물건, 몽글이와 함께 따뜻하게 찾아요!</p>
                     </div>
                 </div>
 
-                <!-- Right Action Buttons -->
-                <div class="flex items-center gap-3">
-                    <button id="openNewPostBtn" class="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white font-medium px-4 py-2.5 rounded-xl transition shadow-md shadow-indigo-100 text-sm">
-                        <i data-lucide="plus-circle" class="w-4 h-4"></i>
-                        <span>글작성하기</span>
-                    </button>
-                </div>
+                <!-- Create Post Button -->
+                <button id="openNewPostBtn" class="bounce-hover bounce-click bg-gradient-to-r from-peach-400 to-peach-500 hover:from-peach-500 hover:to-peach-600 text-white font-bold px-5 py-2.5 rounded-full shadow-lg shadow-peach-200 flex items-center gap-2 text-sm border-2 border-white">
+                    <i data-lucide="sparkles" class="w-4 h-4"></i>
+                    <span>글 쓰기</span>
+                </button>
             </div>
         </div>
     </header>
 
-    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    <main class="flex-grow max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
         
-        <!-- Search & Control Panel -->
-        <section class="bg-white rounded-2xl p-4 sm:p-5 shadow-sm border border-slate-200/80 mb-6 space-y-4">
-            <!-- Search Bar & View Mode Toggle -->
-            <div class="flex flex-col md:flex-row gap-3 items-center justify-between">
-                <div class="relative w-full md:w-96">
-                    <i data-lucide="search" class="w-5 h-5 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"></i>
-                    <input type="text" id="searchInput" placeholder="품목명, 위치, 글제목 검색..." class="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition">
-                </div>
+        <!-- Controls Panel -->
+        <section class="bg-white rounded-3xl p-5 shadow-sm border-2 border-peach-100 mb-6 space-y-4">
+            
+            <!-- Search & View Mode + Status -->
+            <div class="flex flex-col lg:flex-row gap-3.5 items-center justify-between">
                 
-                <div class="flex items-center justify-between w-full md:w-auto gap-3">
-                    <!-- Status Filter Tabs -->
-                    <div class="inline-flex p-1 bg-slate-100 rounded-xl text-xs font-medium text-slate-600" id="statusFilterGroup">
-                        <button data-status="all" class="status-tab px-3 py-1.5 rounded-lg transition bg-white text-indigo-600 shadow-sm font-semibold">전체</button>
-                        <button data-status="lost" class="status-tab px-3 py-1.5 rounded-lg transition hover:text-slate-900">분실해요</button>
-                        <button data-status="found" class="status-tab px-3 py-1.5 rounded-lg transition hover:text-slate-900">습득했어요</button>
-                        <button data-status="resolved" class="status-tab px-3 py-1.5 rounded-lg transition hover:text-slate-900">찾음완료</button>
+                <!-- Search Box -->
+                <div class="relative w-full lg:w-80">
+                    <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-lg">🔍</span>
+                    <input type="text" id="searchInput" placeholder="물건, 장소, 키워드로 찾아봐요..." class="w-full pl-10 pr-4 py-2.5 bg-peach-50/50 border-2 border-peach-100 rounded-2xl text-sm focus:outline-none focus:border-peach-400 transition placeholder:text-slate-300">
+                </div>
+
+                <!-- Status Tabs -->
+                <div class="flex flex-wrap items-center justify-between w-full lg:w-auto gap-2">
+                    <div class="inline-flex p-1 bg-peach-50 rounded-2xl border border-peach-100 text-xs font-bold text-slate-500" id="statusFilterGroup">
+                        <button data-status="all" class="status-tab px-3.5 py-2 rounded-xl transition bg-white text-peach-500 shadow-sm"> 전체보기</button>
+                        <button data-status="lost" class="status-tab px-3.5 py-2 rounded-xl transition hover:text-slate-800">😭 분실해요</button>
+                        <button data-status="found" class="status-tab px-3.5 py-2 rounded-xl transition hover:text-slate-800">🎁 습득했어요</button>
+                        <button data-status="resolved" class="status-tab px-3.5 py-2 rounded-xl transition hover:text-slate-800">🎉 찾았어요!</button>
                     </div>
 
                     <!-- View Switcher -->
-                    <div class="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200/50">
-                        <button id="gridViewBtn" class="p-1.5 rounded-lg text-indigo-600 bg-white shadow-sm transition" title="그리드 뷰">
+                    <div class="flex items-center bg-peach-50 p-1 rounded-2xl border border-peach-100">
+                        <button id="gridViewBtn" class="p-2 rounded-xl text-peach-500 bg-white shadow-sm transition" title="카드 형태로 보기">
                             <i data-lucide="layout-grid" class="w-4 h-4"></i>
                         </button>
-                        <button id="listViewBtn" class="p-1.5 rounded-lg text-slate-500 hover:text-slate-900 transition" title="리스트 뷰">
+                        <button id="listViewBtn" class="p-2 rounded-xl text-slate-400 hover:text-slate-700 transition" title="목록으로 보기">
                             <i data-lucide="list" class="w-4 h-4"></i>
                         </button>
                     </div>
                 </div>
+
             </div>
 
-            <!-- Category Filter Horizontal Scroll -->
-            <div class="pt-2 border-t border-slate-100">
-                <div class="flex items-center gap-2 overflow-x-auto pb-1 text-sm no-scrollbar" id="categoryFilterGroup">
-                    <button data-cat="all" class="cat-chip flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border border-indigo-600 bg-indigo-50 text-indigo-700 font-medium whitespace-nowrap text-xs transition">
-                        <i data-lucide="grid" class="w-3.5 h-3.5"></i> 전체 카테고리
+            <!-- Category Chips -->
+            <div class="pt-3 border-t border-peach-100/60">
+                <div class="flex items-center gap-2 overflow-x-auto pb-1 text-xs no-scrollbar" id="categoryFilterGroup">
+                    <button data-cat="all" class="cat-chip bounce-click px-4 py-2 rounded-2xl border-2 border-peach-400 bg-peach-100 text-peach-600 font-bold whitespace-nowrap transition flex items-center gap-1.5 shadow-sm">
+                        <span>🌈</span> 전체 카테고리
                     </button>
-                    <button data-cat="전자기기" class="cat-chip flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 font-medium whitespace-nowrap text-xs transition">
-                        <i data-lucide="smartphone" class="w-3.5 h-3.5"></i> 전자기기
+                    <button data-cat="전자기기" class="cat-chip bounce-click px-4 py-2 rounded-2xl border-2 border-slate-100 bg-slate-50 text-slate-600 hover:bg-peach-50 font-bold whitespace-nowrap transition flex items-center gap-1.5">
+                        <span>📱</span> 전자기기
                     </button>
-                    <button data-cat="지갑/신용카드" class="cat-chip flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 font-medium whitespace-nowrap text-xs transition">
-                        <i data-lucide="wallet" class="w-3.5 h-3.5"></i> 지갑/신용카드
+                    <button data-cat="지갑/카드" class="cat-chip bounce-click px-4 py-2 rounded-2xl border-2 border-slate-100 bg-slate-50 text-slate-600 hover:bg-peach-50 font-bold whitespace-nowrap transition flex items-center gap-1.5">
+                        <span>👛</span> 지갑/카드
                     </button>
-                    <button data-cat="가방/의류" class="cat-chip flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 font-medium whitespace-nowrap text-xs transition">
-                        <i data-lucide="shopping-bag" class="w-3.5 h-3.5"></i> 가방/의류
+                    <button data-cat="가방/의류" class="cat-chip bounce-click px-4 py-2 rounded-2xl border-2 border-slate-100 bg-slate-50 text-slate-600 hover:bg-peach-50 font-bold whitespace-nowrap transition flex items-center gap-1.5">
+                        <span>🎒</span> 가방/의류
                     </button>
-                    <button data-cat="액세서리" class="cat-chip flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 font-medium whitespace-nowrap text-xs transition">
-                        <i data-lucide="watch" class="w-3.5 h-3.5"></i> 액세서리
+                    <button data-cat="악세사리" class="cat-chip bounce-click px-4 py-2 rounded-2xl border-2 border-slate-100 bg-slate-50 text-slate-600 hover:bg-peach-50 font-bold whitespace-nowrap transition flex items-center gap-1.5">
+                        <span>💍</span> 악세사리
                     </button>
-                    <button data-cat="기타" class="cat-chip flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 font-medium whitespace-nowrap text-xs transition">
-                        <i data-lucide="more-horizontal" class="w-3.5 h-3.5"></i> 기타
+                    <button data-cat="반려동물" class="cat-chip bounce-click px-4 py-2 rounded-2xl border-2 border-slate-100 bg-slate-50 text-slate-600 hover:bg-peach-50 font-bold whitespace-nowrap transition flex items-center gap-1.5">
+                        <span>🐶</span> 반려동물
+                    </button>
+                    <button data-cat="기타" class="cat-chip bounce-click px-4 py-2 rounded-2xl border-2 border-slate-100 bg-slate-50 text-slate-600 hover:bg-peach-50 font-bold whitespace-nowrap transition flex items-center gap-1.5">
+                        <span>🧸</span> 기타 물품
                     </button>
                 </div>
             </div>
+
         </section>
 
-        <!-- Post List Container -->
+        <!-- Posts Container -->
         <section id="postsContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-            <!-- Dynamic Post Cards loaded via JS -->
+            <!-- Dynamic Post Cards loaded here -->
         </section>
 
-        <!-- Empty State -->
-        <div id="emptyState" class="hidden text-center py-16 bg-white rounded-2xl border border-slate-200 shadow-sm mt-4">
-            <div class="w-16 h-16 bg-slate-100 text-slate-400 rounded-full flex items-center justify-center mx-auto mb-3">
-                <i data-lucide="inbox" class="w-8 h-8"></i>
+        <!-- Cute Empty State (Default zero items) -->
+        <div id="emptyState" class="text-center py-16 px-6 bg-white rounded-3xl border-2 border-dashed border-peach-200 mt-2 shadow-sm">
+            <div class="relative w-28 h-28 mx-auto mb-4 flex items-center justify-center bg-peach-50 rounded-full border-2 border-peach-100 animate-float">
+                <span class="text-6xl">🌸</span>
+                <span class="absolute -bottom-1 -right-1 text-2xl">🔍</span>
             </div>
-            <h3 class="text-base font-semibold text-slate-800">등록된 게시물이 없습니다</h3>
-            <p class="text-xs text-slate-500 mt-1">검색어를 변경하거나 새로운 분실/습득물을 등록해 보세요.</p>
+            <h3 class="text-xl font-bold text-slate-800 font-cute text-2xl mb-1">아직 등록된 분실물이 없어요!</h3>
+            <p class="text-xs sm:text-sm text-slate-400 max-w-sm mx-auto leading-relaxed">
+                소중한 물건을 잃어버리셨거나 주우셨나요?<br>오른쪽 상단 <strong class="text-peach-500 font-bold">'글 쓰기'</strong> 버튼을 눌러 제보해 보세요!
+            </p>
+            <button onclick="document.getElementById('openNewPostBtn').click()" class="mt-5 bounce-hover bounce-click bg-peach-100 text-peach-600 hover:bg-peach-200 px-5 py-2.5 rounded-full text-xs font-bold border border-peach-200 transition inline-flex items-center gap-1.5">
+                <span>✨ 첫 분실물 제보하러 가기</span>
+            </button>
         </div>
+
     </main>
 
     <!-- New Post Modal -->
-    <div id="newPostModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm hidden">
-        <div class="bg-white rounded-2xl max-w-lg w-full max-h-[90vh] flex flex-col shadow-2xl border border-slate-100 overflow-hidden transform transition-all">
+    <div id="newPostModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm hidden">
+        <div class="bg-white rounded-3xl max-w-lg w-full max-h-[90vh] flex flex-col shadow-2xl border-4 border-peach-100 overflow-hidden transform transition-all">
+            
             <!-- Modal Header -->
-            <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
-                <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
-                    <i data-lucide="file-plus-2" class="w-5 h-5 text-indigo-600"></i>
-                    게시글 작성하기
+            <div class="px-6 py-4 bg-gradient-to-r from-peach-50 to-lavender-100 border-b-2 border-peach-100 flex justify-between items-center">
+                <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2 font-cute text-xl">
+                    <span>🎀</span>
+                    <span>새로운 소식 등록하기</span>
                 </h2>
-                <button id="closeNewPostBtn" class="text-slate-400 hover:text-slate-600 p-1 rounded-lg hover:bg-slate-100">
+                <button id="closeNewPostBtn" class="text-slate-400 hover:text-slate-600 p-1.5 rounded-2xl hover:bg-white transition">
                     <i data-lucide="x" class="w-5 h-5"></i>
                 </button>
             </div>
 
             <!-- Form Body -->
-            <form id="postForm" class="p-6 overflow-y-auto space-y-4 text-sm">
-                <!-- Status Type -->
+            <form id="postForm" class="p-6 overflow-y-auto space-y-4 text-xs sm:text-sm">
+                
+                <!-- Type Selection -->
                 <div>
-                    <label class="block font-medium text-slate-700 mb-1.5">구분 <span class="text-rose-500">*</span></label>
+                    <label class="block font-bold text-slate-700 mb-2">어떤 소식인가요? <span class="text-peach-500">*</span></label>
                     <div class="grid grid-cols-2 gap-3">
-                        <label class="border border-slate-200 rounded-xl p-3 flex items-center justify-center gap-2 cursor-pointer hover:bg-slate-50 has-[:checked]:border-rose-500 has-[:checked]:bg-rose-50/50 has-[:checked]:text-rose-600 font-medium text-slate-600 transition">
+                        <label class="border-2 border-slate-100 rounded-2xl p-3 flex items-center justify-center gap-2 cursor-pointer hover:bg-peach-50/50 has-[:checked]:border-peach-400 has-[:checked]:bg-peach-50 has-[:checked]:text-peach-600 font-bold text-slate-500 transition">
                             <input type="radio" name="type" value="lost" checked class="hidden">
-                            <i data-lucide="help-circle" class="w-4 h-4"></i>
-                            <span>분실했어요 (잃어버림)</span>
+                            <span>😭 분실해요 (잃어버림)</span>
                         </label>
-                        <label class="border border-slate-200 rounded-xl p-3 flex items-center justify-center gap-2 cursor-pointer hover:bg-slate-50 has-[:checked]:border-blue-500 has-[:checked]:bg-blue-50/50 has-[:checked]:text-blue-600 font-medium text-slate-600 transition">
+                        <label class="border-2 border-slate-100 rounded-2xl p-3 flex items-center justify-center gap-2 cursor-pointer hover:bg-mint-50/50 has-[:checked]:border-mint-500 has-[:checked]:bg-mint-50 has-[:checked]:text-mint-600 font-bold text-slate-500 transition">
                             <input type="radio" name="type" value="found" class="hidden">
-                            <i data-lucide="check-circle-2" class="w-4 h-4"></i>
-                            <span>습득했어요 (주웠음)</span>
+                            <span>🎁 습득했어요 (주웠음)</span>
                         </label>
                     </div>
                 </div>
 
                 <!-- Title -->
                 <div>
-                    <label for="postTitle" class="block font-medium text-slate-700 mb-1">제목 <span class="text-rose-500">*</span></label>
-                    <input type="text" id="postTitle" required placeholder="예: 강남역 인근에서 에어팟 프로 2세대 습득" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500">
+                    <label for="postTitle" class="block font-bold text-slate-700 mb-1">제목 <span class="text-peach-500">*</span></label>
+                    <input type="text" id="postTitle" required placeholder="예: 무지개 도서관 근처에서 곰돌이 지갑 보신 분!" class="w-full px-3.5 py-2.5 bg-slate-50 border-2 border-slate-100 rounded-2xl focus:outline-none focus:border-peach-400 transition">
                 </div>
 
                 <!-- Category & Date Grid -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
-                        <label for="postCategory" class="block font-medium text-slate-700 mb-1">카테고리 <span class="text-rose-500">*</span></label>
-                        <select id="postCategory" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500">
-                            <option value="전자기기">전자기기</option>
-                            <option value="지갑/신용카드">지갑/신용카드</option>
-                            <option value="가방/의류">가방/의류</option>
-                            <option value="액세서리">액세서리</option>
-                            <option value="기타">기타</option>
+                        <label for="postCategory" class="block font-bold text-slate-700 mb-1">카테고리 <span class="text-peach-500">*</span></label>
+                        <select id="postCategory" required class="w-full px-3.5 py-2.5 bg-slate-50 border-2 border-slate-100 rounded-2xl focus:outline-none focus:border-peach-400 transition">
+                            <option value="전자기기">📱 전자기기</option>
+                            <option value="지갑/카드">👛 지갑/카드</option>
+                            <option value="가방/의류">🎒 가방/의류</option>
+                            <option value="악세사리">💍 악세사리</option>
+                            <option value="반려동물">🐶 반려동물</option>
+                            <option value="기타">🧸 기타</option>
                         </select>
                     </div>
                     <div>
-                        <label for="postDate" class="block font-medium text-slate-700 mb-1">일시 <span class="text-rose-500">*</span></label>
-                        <input type="date" id="postDate" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500">
+                        <label for="postDate" class="block font-bold text-slate-700 mb-1">날짜 <span class="text-peach-500">*</span></label>
+                        <input type="date" id="postDate" required class="w-full px-3.5 py-2.5 bg-slate-50 border-2 border-slate-100 rounded-2xl focus:outline-none focus:border-peach-400 transition">
                     </div>
                 </div>
 
                 <!-- Location & Contact -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
-                        <label for="postLocation" class="block font-medium text-slate-700 mb-1">장소 <span class="text-rose-500">*</span></label>
-                        <input type="text" id="postLocation" required placeholder="예: 서울 지하철 2호선" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500">
+                        <label for="postLocation" class="block font-bold text-slate-700 mb-1">장소 <span class="text-peach-500">*</span></label>
+                        <input type="text" id="postLocation" required placeholder="예: 중앙공원 벤치 근처" class="w-full px-3.5 py-2.5 bg-slate-50 border-2 border-slate-100 rounded-2xl focus:outline-none focus:border-peach-400 transition">
                     </div>
                     <div>
-                        <label for="postContact" class="block font-medium text-slate-700 mb-1">연락처 / 오픈채팅 <span class="text-rose-500">*</span></label>
-                        <input type="text" id="postContact" required placeholder="010-XXXX-XXXX 또는 카카오 ID" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500">
+                        <label for="postContact" class="block font-bold text-slate-700 mb-1">연락처 / 오픈채팅 <span class="text-peach-500">*</span></label>
+                        <input type="text" id="postContact" required placeholder="010-XXXX-XXXX 또는 카톡ID" class="w-full px-3.5 py-2.5 bg-slate-50 border-2 border-slate-100 rounded-2xl focus:outline-none focus:border-peach-400 transition">
                     </div>
                 </div>
 
-                <!-- Image Upload / Preset -->
+                <!-- Cute Image Picker / URL Input -->
                 <div>
-                    <label class="block font-medium text-slate-700 mb-1">이미지 URL (선택)</label>
-                    <input type="url" id="postImageUrl" placeholder="https://example.com/image.jpg (미입력시 기본 이미지)" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500">
+                    <label class="block font-bold text-slate-700 mb-1">사진 등록 (선택)</label>
+                    <input type="url" id="postImageUrl" placeholder="https://... 이미지 URL (미입력 시 예쁜 일러스트 자동선택)" class="w-full px-3.5 py-2.5 bg-slate-50 border-2 border-slate-100 rounded-2xl focus:outline-none focus:border-peach-400 transition text-xs mb-2">
+                    
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs text-slate-400">귀여운 기본 아이콘 추천:</span>
+                        <div class="flex gap-1.5" id="presetIconPicker">
+                            <button type="button" data-preset="🧸" class="preset-btn px-2.5 py-1 rounded-xl bg-peach-50 border border-peach-200 text-sm hover:scale-110 transition">🧸</button>
+                            <button type="button" data-preset="📱" class="preset-btn px-2.5 py-1 rounded-xl bg-peach-50 border border-peach-200 text-sm hover:scale-110 transition">📱</button>
+                            <button type="button" data-preset="👛" class="preset-btn px-2.5 py-1 rounded-xl bg-peach-50 border border-peach-200 text-sm hover:scale-110 transition">👛</button>
+                            <button type="button" data-preset="🐶" class="preset-btn px-2.5 py-1 rounded-xl bg-peach-50 border border-peach-200 text-sm hover:scale-110 transition">🐶</button>
+                            <button type="button" data-preset="🔑" class="preset-btn px-2.5 py-1 rounded-xl bg-peach-50 border border-peach-200 text-sm hover:scale-110 transition">🔑</button>
+                        </div>
+                    </div>
                 </div>
 
-                <!-- Description -->
+                <!-- Description & Reward -->
                 <div>
-                    <label for="postDesc" class="block font-medium text-slate-700 mb-1">상세 설명</label>
-                    <textarea id="postDesc" rows="3" placeholder="특징, 색상, 내부 내용물 등 구체적인 정보를 적어주세요." class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 resize-none"></textarea>
+                    <label for="postDesc" class="block font-bold text-slate-700 mb-1">상세 설명 & 특징</label>
+                    <textarea id="postDesc" rows="3" placeholder="물건의 색상, 모양, 인형 키링 유무 등 자세히 적어주시면 찾기가 훨씬 쉬워져요!" class="w-full px-3.5 py-2.5 bg-slate-50 border-2 border-slate-100 rounded-2xl focus:outline-none focus:border-peach-400 transition resize-none"></textarea>
                 </div>
 
                 <!-- Submit Button -->
                 <div class="pt-2">
-                    <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white font-semibold py-3 rounded-xl transition shadow-md shadow-indigo-100 flex items-center justify-center gap-2">
-                        <i data-lucide="check" class="w-5 h-5"></i>
-                        <span>게시글 등록하기</span>
+                    <button type="submit" class="bounce-hover bounce-click w-full bg-gradient-to-r from-peach-400 to-peach-500 hover:from-peach-500 hover:to-peach-600 text-white font-bold py-3.5 rounded-2xl shadow-lg shadow-peach-200 transition flex items-center justify-center gap-2 text-sm">
+                        <span>🌸 게시글 소중하게 등록하기</span>
                     </button>
                 </div>
             </form>
@@ -223,166 +323,123 @@
     </div>
 
     <!-- Detail & Comments Modal -->
-    <div id="detailModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm hidden">
-        <div class="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] flex flex-col shadow-2xl border border-slate-100 overflow-hidden">
+    <div id="detailModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm hidden">
+        <div class="bg-white rounded-3xl max-w-2xl w-full max-h-[90vh] flex flex-col shadow-2xl border-4 border-peach-100 overflow-hidden">
+            
             <!-- Modal Header -->
-            <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
-                <span id="modalTypeBadge" class="px-2.5 py-1 rounded-md text-xs font-semibold">분실물</span>
+            <div class="px-6 py-4 bg-slate-50 border-b-2 border-peach-100 flex justify-between items-center">
+                <span id="modalTypeBadge" class="px-3 py-1 rounded-full text-xs font-bold border">분실물</span>
                 <div class="flex items-center gap-2">
-                    <button id="toggleResolveBtn" class="px-3 py-1.5 rounded-lg border border-slate-200 text-xs font-semibold text-slate-700 hover:bg-slate-100 transition flex items-center gap-1.5">
-                        <i data-lucide="check-circle" class="w-4 h-4 text-emerald-600"></i>
-                        <span>완료 상태 변경</span>
+                    <button id="toggleResolveBtn" class="bounce-click px-3 py-1.5 rounded-xl border-2 border-mint-300 bg-mint-50 text-xs font-bold text-mint-600 hover:bg-mint-100 transition flex items-center gap-1.5">
+                        <i data-lucide="check-circle-2" class="w-4 h-4"></i>
+                        <span id="resolveBtnText">찾음 완료하기!</span>
                     </button>
-                    <button id="deletePostBtn" class="p-1.5 text-slate-400 hover:text-rose-600 rounded-lg hover:bg-slate-100 transition" title="게시글 삭제">
+                    <button id="deletePostBtn" class="p-2 text-slate-400 hover:text-rose-500 rounded-xl hover:bg-rose-50 transition" title="게시글 삭제">
                         <i data-lucide="trash-2" class="w-4 h-4"></i>
                     </button>
-                    <button id="closeDetailBtn" class="p-1.5 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-100">
+                    <button id="closeDetailBtn" class="p-2 text-slate-400 hover:text-slate-600 rounded-xl hover:bg-slate-100">
                         <i data-lucide="x" class="w-5 h-5"></i>
                     </button>
                 </div>
             </div>
 
-            <!-- Content Area -->
+            <!-- Modal Content Area -->
             <div class="p-6 overflow-y-auto space-y-6">
-                <!-- Main Info Header -->
-                <div class="flex flex-col md:flex-row gap-5">
-                    <!-- Image -->
-                    <div class="w-full md:w-1/2 aspect-video md:aspect-square bg-slate-100 rounded-xl overflow-hidden border border-slate-200/60 relative">
-                        <img id="modalImage" src="" alt="물품 이미지" class="w-full h-full object-cover">
+                
+                <!-- Main Header Info -->
+                <div class="flex flex-col sm:flex-row gap-5">
+                    
+                    <!-- Image or Emoji Container -->
+                    <div id="modalImgContainer" class="w-full sm:w-1/2 aspect-square bg-peach-50 rounded-2xl border-2 border-peach-100 flex items-center justify-center overflow-hidden relative shadow-inner">
+                        <img id="modalImage" src="" alt="물품" class="w-full h-full object-cover hidden">
+                        <span id="modalEmoji" class="text-7xl animate-float">🧸</span>
                     </div>
 
                     <!-- Details -->
-                    <div class="w-full md:w-1/2 flex flex-col justify-between space-y-3">
+                    <div class="w-full sm:w-1/2 flex flex-col justify-between space-y-3">
                         <div>
-                            <div class="text-xs font-medium text-indigo-600 mb-1" id="modalCategory">전자기기</div>
-                            <h2 id="modalTitle" class="text-xl font-bold text-slate-900 leading-snug">에어팟 프로 습득</h2>
+                            <span id="modalCategory" class="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold bg-lavender-100 text-lavender-500 mb-1">카테고리</span>
+                            <h2 id="modalTitle" class="text-xl font-bold text-slate-800 leading-snug">게시글 제목</h2>
                             
                             <div class="mt-4 space-y-2 text-xs sm:text-sm text-slate-600">
                                 <div class="flex items-center gap-2">
-                                    <i data-lucide="map-pin" class="w-4 h-4 text-slate-400 shrink-0"></i>
-                                    <span class="font-medium text-slate-500">장소:</span>
-                                    <span id="modalLocation" class="text-slate-800">강남역 2번 출구</span>
+                                    <span class="w-5 text-center">📍</span>
+                                    <span class="font-bold text-slate-400">장소:</span>
+                                    <span id="modalLocation" class="text-slate-700 font-semibold">강남역 인근</span>
                                 </div>
                                 <div class="flex items-center gap-2">
-                                    <i data-lucide="calendar" class="w-4 h-4 text-slate-400 shrink-0"></i>
-                                    <span class="font-medium text-slate-500">일시:</span>
-                                    <span id="modalDate" class="text-slate-800">2026-09-28</span>
+                                    <span class="w-5 text-center">📅</span>
+                                    <span class="font-bold text-slate-400">날짜:</span>
+                                    <span id="modalDate" class="text-slate-700 font-semibold">2026-09-28</span>
                                 </div>
-                                <div class="flex items-center gap-2 bg-indigo-50/70 p-2.5 rounded-xl border border-indigo-100">
-                                    <i data-lucide="phone" class="w-4 h-4 text-indigo-600 shrink-0"></i>
-                                    <span class="font-medium text-indigo-900">연락처:</span>
-                                    <span id="modalContact" class="font-semibold text-indigo-700">010-1234-5678</span>
+                                <div class="flex items-center gap-2 bg-butter-100/70 p-3 rounded-2xl border border-butter-300">
+                                    <span class="w-5 text-center">💌</span>
+                                    <span class="font-bold text-amber-800">연락처:</span>
+                                    <span id="modalContact" class="font-bold text-amber-900">010-XXXX-XXXX</span>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="pt-2 text-xs text-slate-400 border-t border-slate-100">
-                            작성일: <span id="modalCreatedAt">2026.09.28</span>
+                        <div class="pt-2 text-[11px] text-slate-400 border-t border-slate-100 flex justify-between">
+                            <span>등록일: <span id="modalCreatedAt">2026.09.28</span></span>
                         </div>
                     </div>
                 </div>
 
-                <!-- Description -->
-                <div class="bg-slate-50 p-4 rounded-xl border border-slate-200/60">
-                    <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">상세 내용</h3>
-                    <p id="modalDescription" class="text-sm text-slate-700 whitespace-pre-line leading-relaxed">
-                        상세 정보가 적혀있는 영역입니다.
+                <!-- Detailed Text -->
+                <div class="bg-peach-50/60 p-4 rounded-2xl border border-peach-100">
+                    <h3 class="text-xs font-bold text-peach-500 uppercase tracking-wider mb-1.5 flex items-center gap-1">
+                        <span>📝</span> 상세 내용
+                    </h3>
+                    <p id="modalDescription" class="text-xs sm:text-sm text-slate-700 whitespace-pre-line leading-relaxed">
+                        상세 정보 설명입니다.
                     </p>
                 </div>
 
-                <!-- Comments Section -->
+                <!-- Cute Comments Section -->
                 <div class="border-t border-slate-100 pt-5">
-                    <h3 class="text-sm font-bold text-slate-900 mb-3 flex items-center gap-1.5">
-                        <i data-lucide="message-square" class="w-4 h-4 text-indigo-600"></i>
-                        <span>댓글 및 문의 (<span id="commentCount">0</span>)</span>
+                    <h3 class="text-sm font-bold text-slate-800 mb-3 flex items-center gap-1.5">
+                        <span>💬</span>
+                        <span>몽글 댓글 방 (<span id="commentCount">0</span>)</span>
                     </h3>
 
-                    <!-- Comments List -->
-                    <div id="commentsList" class="space-y-3 max-h-48 overflow-y-auto pr-1 mb-4">
-                        <!-- Comment Item Placeholder -->
+                    <!-- Comment List -->
+                    <div id="commentsList" class="space-y-2.5 max-h-48 overflow-y-auto pr-1 mb-4">
+                        <!-- Comments injected here -->
                     </div>
 
-                    <!-- Comment Input -->
+                    <!-- Add Comment Form -->
                     <form id="commentForm" class="flex gap-2">
-                        <input type="text" id="commentAuthor" required placeholder="작성자" class="w-24 px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500">
-                        <input type="text" id="commentInput" required placeholder="댓글을 입력하세요..." class="flex-grow px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500">
-                        <button type="submit" class="px-4 py-2 bg-slate-900 text-white rounded-xl text-xs font-medium hover:bg-slate-800 transition shrink-0">
-                            등록
+                        <input type="text" id="commentAuthor" required placeholder="닉네임" class="w-24 px-3 py-2 bg-slate-50 border-2 border-slate-100 rounded-xl text-xs focus:outline-none focus:border-peach-400">
+                        <input type="text" id="commentInput" required placeholder="따뜻한 댓글을 남겨주세요..." class="flex-grow px-3.5 py-2 bg-slate-50 border-2 border-slate-100 rounded-xl text-xs focus:outline-none focus:border-peach-400">
+                        <button type="submit" class="bounce-hover bounce-click px-4 py-2 bg-peach-400 hover:bg-peach-500 text-white font-bold rounded-xl text-xs transition shrink-0 shadow-sm">
+                            등록 🐾
                         </button>
                     </form>
                 </div>
+
             </div>
         </div>
     </div>
 
     <!-- Toast Notification Container -->
-    <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+    <div id="toastContainer" class="fixed bottom-6 right-6 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+    <!-- Footer -->
+    <footer class="bg-white/60 border-t border-peach-100 py-4 text-center text-xs text-slate-400 mt-10">
+        <p>몽글몽글 분실물 센터 🌸 · 소중한 기억을 함께 찾아갑니다</p>
+    </footer>
 
     <script>
-        // Default Sample Data
-        const SAMPLE_POSTS = [
-            {
-                id: 'post-1',
-                type: 'found', // 'lost' | 'found'
-                status: 'active', // 'active' | 'resolved'
-                title: '강남역 2번 출구 근처 에어팟 프로 2세대 습득했습니다',
-                category: '전자기기',
-                location: '서울 강남구 강남역 2번 출구 인근',
-                date: '2026-09-27',
-                contact: '카카오톡 오픈채팅: @AirPodsFind2026',
-                imageUrl: 'https://images.unsplash.com/photo-1600294037681-c80b4cb5b434?w=600&auto=format&fit=crop&q=80',
-                description: '길가에 떨어진 에어팟 케이스(투명 케이스 씌워짐)를 발견했습니다. 본체 안에 귀여운 스티커가 붙어있네요. 본인 확인을 위해 스티커 모양을 말씀해주세요.',
-                createdAt: '2026-09-27 14:30',
-                comments: [
-                    { id: 'c1', author: '손님1', text: '혹시 케이스에 곰돌이 스티커 붙어있나요?', createdAt: '2026-09-27 15:10' },
-                    { id: 'c2', author: '작성자', text: '네 맞습니다! 개인 메시지 부탁드립니다.', createdAt: '2026-09-27 15:25' }
-                ]
-            },
-            {
-                id: 'post-2',
-                type: 'lost',
-                status: 'active',
-                title: '홍대입구역 부근 에르메스 가죽 지갑 분실',
-                category: '지갑/신용카드',
-                location: '서울 마포구 홍대입구역 9번 출구 카페거리',
-                date: '2026-09-26',
-                contact: '010-9876-5432',
-                imageUrl: 'https://images.unsplash.com/photo-1627123424574-724758594e93?w=600&auto=format&fit=crop&q=80',
-                description: '검은색 가죽 지갑입니다. 안에 신분증과 신용카드 2장, 약간의 현금이 들어있습니다. 사례금 꼭 드리겠습니다. 연락 부탁드립니다!',
-                createdAt: '2026-09-26 18:20',
-                comments: []
-            },
-            {
-                id: 'post-3',
-                type: 'found',
-                status: 'resolved',
-                title: '아이폰 15 스페이스 블랙 습득 (주인 찾음)',
-                category: '전자기기',
-                location: '여의도 한강공원 잔디밭',
-                date: '2026-09-25',
-                contact: '010-5555-1234',
-                imageUrl: 'https://images.unsplash.com/photo-1510557880182-3d4d3cba35a5?w=600&auto=format&fit=crop&q=80',
-                description: '주인분께서 연락주셔서 안전하게 돌려드렸습니다.',
-                createdAt: '2026-09-25 11:00',
-                comments: [
-                    { id: 'c3', author: '감사합니다', text: '소중한 핸드폰 찾아주셔서 정말 감사합니다!', createdAt: '2026-09-25 16:40' }
-                ]
-            },
-            {
-                id: 'post-4',
-                type: 'lost',
-                status: 'active',
-                title: '성수동 카페에서 프라다 백팩 분실했습니다',
-                category: '가방/의류',
-                location: '서울 성동구 성수동 연무장길 카페',
-                date: '2026-09-28',
-                contact: '010-3333-7777',
-                imageUrl: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=600&auto=format&fit=crop&q=80',
-                description: '검정색 나일론 백팩입니다. 내부 노트북 파우치에 서류와 노트북이 들어있습니다.',
-                createdAt: '2026-09-28 09:15',
-                comments: []
-            }
-        ];
+        // Category Presets & Icons Map
+        const CATEGORY_MAP = {
+            '전자기기': { icon: '📱', color: 'bg-blue-50 text-blue-600 border-blue-200' },
+            '지갑/카드': { icon: '👛', color: 'bg-amber-50 text-amber-600 border-amber-200' },
+            '가방/의류': { icon: '🎒', color: 'bg-purple-50 text-purple-600 border-purple-200' },
+            '악세사리': { icon: '💍', color: 'bg-rose-50 text-rose-600 border-rose-200' },
+            '반려동물': { icon: '🐶', color: 'bg-emerald-50 text-emerald-600 border-emerald-200' },
+            '기타': { icon: '🧸', color: 'bg-slate-50 text-slate-600 border-slate-200' }
+        };
 
         // App State
         let posts = [];
@@ -391,15 +448,7 @@
         let searchQuery = '';
         let viewMode = 'grid'; // 'grid' | 'list'
         let currentDetailPostId = null;
-
-        // Category Default Icons & Images mapping
-        const categoryConfig = {
-            '전자기기': { icon: 'smartphone', defaultImg: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=600&auto=format&fit=crop&q=80' },
-            '지갑/신용카드': { icon: 'wallet', defaultImg: 'https://images.unsplash.com/photo-1627123424574-724758594e93?w=600&auto=format&fit=crop&q=80' },
-            '가방/의류': { icon: 'shopping-bag', defaultImg: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=600&auto=format&fit=crop&q=80' },
-            '액세서리': { icon: 'watch', defaultImg: 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=600&auto=format&fit=crop&q=80' },
-            '기타': { icon: 'more-horizontal', defaultImg: 'https://images.unsplash.com/photo-1584438784894-089d6a62b8fa?w=600&auto=format&fit=crop&q=80' }
-        };
+        let selectedPresetEmoji = '🧸';
 
         // DOM Elements
         const postsContainer = document.getElementById('postsContainer');
@@ -417,10 +466,11 @@
         const detailModal = document.getElementById('detailModal');
         const closeDetailBtn = document.getElementById('closeDetailBtn');
         const toggleResolveBtn = document.getElementById('toggleResolveBtn');
+        const resolveBtnText = document.getElementById('resolveBtnText');
         const deletePostBtn = document.getElementById('deletePostBtn');
         const commentForm = document.getElementById('commentForm');
 
-        // Initialize Application
+        // Initialization
         window.addEventListener('DOMContentLoaded', () => {
             loadPostsFromStorage();
             setupEventListeners();
@@ -428,54 +478,52 @@
             lucide.createIcons();
         });
 
-        // Load or Initialize LocalStorage Data
+        // LocalStorage Management - Defaults to Empty Array []
         function loadPostsFromStorage() {
-            const saved = localStorage.getItem('lost_found_posts');
+            const saved = localStorage.getItem('monggle_lost_found_posts');
             if (saved) {
                 try {
                     posts = JSON.parse(saved);
                 } catch (e) {
-                    posts = [...SAMPLE_POSTS];
+                    posts = [];
                 }
             } else {
-                posts = [...SAMPLE_POSTS];
+                posts = []; // Strictly zero items initially
                 savePostsToStorage();
             }
         }
 
         function savePostsToStorage() {
-            localStorage.setItem('lost_found_posts', JSON.stringify(posts));
+            localStorage.setItem('monggle_lost_found_posts', JSON.stringify(posts));
         }
 
         function setupEventListeners() {
-            // Search Input
+            // Search Input Filter
             searchInput.addEventListener('input', (e) => {
                 searchQuery = e.target.value.trim().toLowerCase();
                 renderPosts();
             });
 
-            // Status Filters
+            // Status Tab Filtering
             document.querySelectorAll('#statusFilterGroup button').forEach(btn => {
                 btn.addEventListener('click', () => {
                     document.querySelectorAll('#statusFilterGroup button').forEach(b => {
-                        b.classList.remove('bg-white', 'text-indigo-600', 'shadow-sm', 'font-semibold');
-                        b.classList.add('hover:text-slate-900');
+                        b.classList.remove('bg-white', 'text-peach-500', 'shadow-sm');
                     });
-                    btn.classList.add('bg-white', 'text-indigo-600', 'shadow-sm', 'font-semibold');
-                    btn.classList.remove('hover:text-slate-900');
+                    btn.classList.add('bg-white', 'text-peach-500', 'shadow-sm');
 
                     activeStatusFilter = btn.dataset.status;
                     renderPosts();
                 });
             });
 
-            // Category Filters
+            // Category Filter Group
             document.querySelectorAll('#categoryFilterGroup button').forEach(btn => {
                 btn.addEventListener('click', () => {
                     document.querySelectorAll('#categoryFilterGroup button').forEach(b => {
-                        b.className = 'cat-chip flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 font-medium whitespace-nowrap text-xs transition';
+                        b.className = 'cat-chip bounce-click px-4 py-2 rounded-2xl border-2 border-slate-100 bg-slate-50 text-slate-600 hover:bg-peach-50 font-bold whitespace-nowrap transition flex items-center gap-1.5';
                     });
-                    btn.className = 'cat-chip flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border border-indigo-600 bg-indigo-50 text-indigo-700 font-medium whitespace-nowrap text-xs transition';
+                    btn.className = 'cat-chip bounce-click px-4 py-2 rounded-2xl border-2 border-peach-400 bg-peach-100 text-peach-600 font-bold whitespace-nowrap transition flex items-center gap-1.5 shadow-sm';
 
                     activeCategoryFilter = btn.dataset.cat;
                     renderPosts();
@@ -485,62 +533,70 @@
             // View Mode Toggle
             gridViewBtn.addEventListener('click', () => {
                 viewMode = 'grid';
-                gridViewBtn.className = 'p-1.5 rounded-lg text-indigo-600 bg-white shadow-sm transition';
-                listViewBtn.className = 'p-1.5 rounded-lg text-slate-500 hover:text-slate-900 transition';
+                gridViewBtn.className = 'p-2 rounded-xl text-peach-500 bg-white shadow-sm transition';
+                listViewBtn.className = 'p-2 rounded-xl text-slate-400 hover:text-slate-700 transition';
                 renderPosts();
             });
 
             listViewBtn.addEventListener('click', () => {
                 viewMode = 'list';
-                listViewBtn.className = 'p-1.5 rounded-lg text-indigo-600 bg-white shadow-sm transition';
-                gridViewBtn.className = 'p-1.5 rounded-lg text-slate-500 hover:text-slate-900 transition';
+                listViewBtn.className = 'p-2 rounded-xl text-peach-500 bg-white shadow-sm transition';
+                gridViewBtn.className = 'p-2 rounded-xl text-slate-400 hover:text-slate-700 transition';
                 renderPosts();
             });
 
-            // New Post Modal Toggle
+            // Preset Emoji Selector inside New Post Form
+            document.querySelectorAll('#presetIconPicker .preset-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    selectedPresetEmoji = btn.dataset.preset;
+                    showToast(`${selectedPresetEmoji} 이모지가 아이콘으로 선택되었어요!`);
+                });
+            });
+
+            // Modal Controls
             openNewPostBtn.addEventListener('click', () => {
-                // Set default date to today
                 document.getElementById('postDate').value = new Date().toISOString().split('T')[0];
                 newPostModal.classList.remove('hidden');
             });
+
             closeNewPostBtn.addEventListener('click', () => newPostModal.classList.add('hidden'));
 
-            // Submit New Post
+            // Submit New Item
             postForm.addEventListener('submit', (e) => {
                 e.preventDefault();
                 const formData = new FormData(postForm);
-                const type = formData.get('type');
                 const category = document.getElementById('postCategory').value;
-                const userImg = document.getElementById('postImageUrl').value.trim();
+                const imageUrl = document.getElementById('postImageUrl').value.trim();
 
                 const newPost = {
-                    id: 'post-' + Date.now(),
-                    type: type,
-                    status: 'active',
+                    id: 'monggle-' + Date.now(),
+                    type: formData.get('type'), // 'lost' | 'found'
+                    status: 'active', // 'active' | 'resolved'
                     title: document.getElementById('postTitle').value.trim(),
                     category: category,
-                    location: document.getElementById('postLocation').value.trim(),
                     date: document.getElementById('postDate').value,
+                    location: document.getElementById('postLocation').value.trim(),
                     contact: document.getElementById('postContact').value.trim(),
-                    imageUrl: userImg || (categoryConfig[category] ? categoryConfig[category].defaultImg : categoryConfig['기타'].defaultImg),
-                    description: document.getElementById('postDesc').value.trim() || '상세 정보가 적혀있지 않습니다.',
-                    createdAt: new Date().toISOString().replace('T', ' ').substring(0, 16),
+                    imageUrl: imageUrl || '',
+                    presetEmoji: selectedPresetEmoji || (CATEGORY_MAP[category]?.icon || '🧸'),
+                    description: document.getElementById('postDesc').value.trim() || '상세 설명이 적혀있지 않아요.',
+                    createdAt: new Date().toLocaleDateString('ko-KR'),
                     comments: []
                 };
 
                 posts.unshift(newPost);
                 savePostsToStorage();
                 renderPosts();
-                
+
                 postForm.reset();
                 newPostModal.classList.add('hidden');
-                showToast('게시글이 성공적으로 등록되었습니다.');
+                showToast('🌸 게시글이 몽글몽글하게 등록되었습니다!');
             });
 
-            // Detail Modal Close
+            // Detail Modal Handlers
             closeDetailBtn.addEventListener('click', () => detailModal.classList.add('hidden'));
 
-            // Toggle Resolved Status
+            // Toggle "Found/Completed" Status
             toggleResolveBtn.addEventListener('click', () => {
                 if (!currentDetailPostId) return;
                 const post = posts.find(p => p.id === currentDetailPostId);
@@ -549,14 +605,14 @@
                     savePostsToStorage();
                     renderPosts();
                     openDetailModal(post.id);
-                    showToast(post.status === 'resolved' ? '완료 처리되었습니다.' : '진행중 상태로 변경되었습니다.');
+                    showToast(post.status === 'resolved' ? '🎉 주인을 찾아 완결 처리되었습니다!' : '상태가 다시 진행중으로 변경되었어요.');
                 }
             });
 
-            // Delete Post
+            // Delete Item
             deletePostBtn.addEventListener('click', () => {
                 if (!currentDetailPostId) return;
-                if (confirm('정말로 이 게시글을 삭제하시겠습니까?')) {
+                if (confirm('이 게시글을 정말 삭제할까요? 🌸')) {
                     posts = posts.filter(p => p.id !== currentDetailPostId);
                     savePostsToStorage();
                     renderPosts();
@@ -565,33 +621,34 @@
                 }
             });
 
-            // Submit Comment
+            // Comment Submission
             commentForm.addEventListener('submit', (e) => {
                 e.preventDefault();
                 if (!currentDetailPostId) return;
 
-                const authorInput = document.getElementById('commentAuthor');
-                const textInput = document.getElementById('commentInput');
+                const author = document.getElementById('commentAuthor').value.trim();
+                const text = document.getElementById('commentInput').value.trim();
 
                 const post = posts.find(p => p.id === currentDetailPostId);
                 if (post) {
+                    if (!post.comments) post.comments = [];
                     post.comments.push({
                         id: 'c-' + Date.now(),
-                        author: authorInput.value.trim(),
-                        text: textInput.value.trim(),
-                        createdAt: new Date().toISOString().replace('T', ' ').substring(0, 16)
+                        author: author,
+                        text: text,
+                        createdAt: new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })
                     });
 
                     savePostsToStorage();
                     renderDetailComments(post.comments);
                     renderPosts();
 
-                    textInput.value = '';
-                    showToast('댓글이 등록되었습니다.');
+                    document.getElementById('commentInput').value = '';
+                    showToast('댓글이 작성되었습니다 🐾');
                 }
             });
 
-            // Close modals on outside click
+            // Outside Modal Click
             window.addEventListener('click', (e) => {
                 if (e.target === newPostModal) newPostModal.classList.add('hidden');
                 if (e.target === detailModal) detailModal.classList.add('hidden');
@@ -599,28 +656,26 @@
         }
 
         function renderPosts() {
-            // Filter Posts
+            // Filtering Logic
             const filtered = posts.filter(post => {
-                // Status Filter
                 if (activeStatusFilter === 'lost' && (post.type !== 'lost' || post.status === 'resolved')) return false;
                 if (activeStatusFilter === 'found' && (post.type !== 'found' || post.status === 'resolved')) return false;
                 if (activeStatusFilter === 'resolved' && post.status !== 'resolved') return false;
 
-                // Category Filter
                 if (activeCategoryFilter !== 'all' && post.category !== activeCategoryFilter) return false;
 
-                // Search Query
                 if (searchQuery) {
                     const matchTitle = post.title.toLowerCase().includes(searchQuery);
-                    const matchLocation = post.location.toLowerCase().includes(searchQuery);
+                    const matchLoc = post.location.toLowerCase().includes(searchQuery);
                     const matchDesc = post.description.toLowerCase().includes(searchQuery);
-                    const matchCategory = post.category.toLowerCase().includes(searchQuery);
-                    if (!matchTitle && !matchLocation && !matchDesc && !matchCategory) return false;
+                    const matchCat = post.category.toLowerCase().includes(searchQuery);
+                    if (!matchTitle && !matchLoc && !matchDesc && !matchCat) return false;
                 }
 
                 return true;
             });
 
+            // Empty State Display
             if (filtered.length === 0) {
                 postsContainer.innerHTML = '';
                 emptyState.classList.remove('hidden');
@@ -629,97 +684,98 @@
                 emptyState.classList.add('hidden');
             }
 
-            // Grid vs List Layout classes
+            // Grid vs List Layout dynamic classes
             if (viewMode === 'grid') {
                 postsContainer.className = 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5';
             } else {
-                postsContainer.className = 'flex flex-col gap-3';
+                postsContainer.className = 'flex flex-col gap-3.5';
             }
 
             postsContainer.innerHTML = filtered.map(post => {
                 const isResolved = post.status === 'resolved';
                 const isLost = post.type === 'lost';
+                const catMeta = CATEGORY_MAP[post.category] || CATEGORY_MAP['기타'];
 
-                // Status Badge styling
+                // Badge Tag
                 let badgeHTML = '';
                 if (isResolved) {
-                    badgeHTML = `<span class="bg-emerald-100 text-emerald-700 border border-emerald-200 text-xs px-2.5 py-0.5 rounded-full font-semibold">찾음 완료</span>`;
+                    badgeHTML = `<span class="bg-mint-100 text-mint-600 border border-mint-300 text-[11px] px-2.5 py-1 rounded-full font-bold flex items-center gap-1">🎉 찾기완료</span>`;
                 } else if (isLost) {
-                    badgeHTML = `<span class="bg-rose-100 text-rose-700 border border-rose-200 text-xs px-2.5 py-0.5 rounded-full font-semibold">분실해요</span>`;
+                    badgeHTML = `<span class="bg-peach-100 text-peach-500 border border-peach-200 text-[11px] px-2.5 py-1 rounded-full font-bold flex items-center gap-1">😭 분실해요</span>`;
                 } else {
-                    badgeHTML = `<span class="bg-blue-100 text-blue-700 border border-blue-200 text-xs px-2.5 py-0.5 rounded-full font-semibold">습득했어요</span>`;
+                    badgeHTML = `<span class="bg-butter-100 text-amber-700 border border-butter-300 text-[11px] px-2.5 py-1 rounded-full font-bold flex items-center gap-1">🎁 습득했어요</span>`;
                 }
 
                 if (viewMode === 'grid') {
                     return `
-                        <div onclick="openDetailModal('${post.id}')" class="group bg-white rounded-2xl border border-slate-200/80 overflow-hidden shadow-sm hover:shadow-md hover:border-indigo-200 transition cursor-pointer flex flex-col ${isResolved ? 'opacity-75 bg-slate-50/50' : ''}">
-                            <!-- Image -->
-                            <div class="relative w-full aspect-[4/3] bg-slate-100 overflow-hidden">
-                                <img src="${post.imageUrl}" alt="${post.title}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" onerror="this.src='https://placehold.co/600x400/f1f5f9/94a3b8?text=No+Image'">
-                                <div class="absolute top-3 left-3 flex gap-1">
-                                    ${badgeHTML}
+                        <div onclick="openDetailModal('${post.id}')" class="bounce-hover bounce-click group bg-white rounded-3xl border-2 border-peach-100/80 overflow-hidden shadow-sm hover:border-peach-300 hover:shadow-md transition cursor-pointer flex flex-col justify-between ${isResolved ? 'opacity-70 bg-slate-50/50' : ''}">
+                            <div>
+                                <!-- Image or Emoji Header -->
+                                <div class="relative w-full aspect-[4/3] bg-peach-50/60 overflow-hidden flex items-center justify-center border-b border-peach-100">
+                                    ${post.imageUrl 
+                                        ? `<img src="${post.imageUrl}" alt="${post.title}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" onerror="this.style.display='none'; this.nextElementSibling.classList.remove('hidden');">`
+                                        : ''
+                                    }
+                                    <span class="text-6xl ${post.imageUrl ? 'hidden' : ''} group-hover:scale-110 transition duration-300">${post.presetEmoji || catMeta.icon}</span>
+                                    
+                                    <div class="absolute top-3 left-3">
+                                        ${badgeHTML}
+                                    </div>
+                                </div>
+                                
+                                <!-- Card Main Content -->
+                                <div class="p-4 space-y-2">
+                                    <div class="flex items-center justify-between">
+                                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${catMeta.color} border">
+                                            ${catMeta.icon} ${post.category}
+                                        </span>
+                                        <span class="text-[10px] text-slate-400 font-num">${post.date}</span>
+                                    </div>
+                                    <h3 class="font-bold text-slate-800 text-sm line-clamp-1 group-hover:text-peach-500 transition">${escapeHtml(post.title)}</h3>
+                                    <p class="text-xs text-slate-500 line-clamp-2 leading-relaxed">${escapeHtml(post.description)}</p>
                                 </div>
                             </div>
-                            
-                            <!-- Content -->
-                            <div class="p-4 flex flex-col flex-grow justify-between space-y-3">
-                                <div>
-                                    <div class="text-[11px] font-medium text-indigo-600 mb-1 flex items-center gap-1">
-                                        <span>${post.category}</span>
-                                    </div>
-                                    <h3 class="font-bold text-slate-900 line-clamp-1 group-hover:text-indigo-600 transition text-sm sm:text-base">${post.title}</h3>
-                                    <p class="text-xs text-slate-500 line-clamp-2 mt-1.5 leading-relaxed">${post.description}</p>
-                                </div>
 
-                                <div class="pt-3 border-t border-slate-100 text-xs text-slate-500 space-y-1">
-                                    <div class="flex items-center gap-1.5 truncate">
-                                        <i data-lucide="map-pin" class="w-3.5 h-3.5 text-slate-400 shrink-0"></i>
-                                        <span class="truncate">${post.location}</span>
-                                    </div>
-                                    <div class="flex items-center justify-between pt-1">
-                                        <span class="flex items-center gap-1 text-[11px] text-slate-400">
-                                            <i data-lucide="calendar" class="w-3 h-3"></i>
-                                            ${post.date}
-                                        </span>
-                                        <span class="flex items-center gap-1 text-[11px] text-slate-400">
-                                            <i data-lucide="message-square" class="w-3 h-3"></i>
-                                            ${post.comments ? post.comments.length : 0}
-                                        </span>
-                                    </div>
+                            <!-- Card Footer -->
+                            <div class="px-4 py-3 bg-peach-50/30 border-t border-peach-100/60 flex items-center justify-between text-xs text-slate-400">
+                                <div class="flex items-center gap-1 truncate max-w-[70%]">
+                                    <span>📍</span>
+                                    <span class="truncate font-medium text-slate-600">${escapeHtml(post.location)}</span>
                                 </div>
+                                <span class="flex items-center gap-1 text-[11px] font-bold text-peach-400">
+                                    💬 ${post.comments ? post.comments.length : 0}
+                                </span>
                             </div>
                         </div>
                     `;
                 } else {
                     // List View Item
                     return `
-                        <div onclick="openDetailModal('${post.id}')" class="group bg-white rounded-2xl border border-slate-200/80 p-3 sm:p-4 shadow-sm hover:shadow-md hover:border-indigo-200 transition cursor-pointer flex items-center gap-4 ${isResolved ? 'opacity-75 bg-slate-50/50' : ''}">
-                            <!-- Thumbnail -->
-                            <div class="w-20 h-20 sm:w-24 sm:h-24 rounded-xl bg-slate-100 overflow-hidden shrink-0 relative">
-                                <img src="${post.imageUrl}" alt="${post.title}" class="w-full h-full object-cover group-hover:scale-105 transition" onerror="this.src='https://placehold.co/200x200/f1f5f9/94a3b8?text=No+Image'">
+                        <div onclick="openDetailModal('${post.id}')" class="bounce-hover bounce-click group bg-white rounded-3xl border-2 border-peach-100/80 p-3.5 shadow-sm hover:border-peach-300 transition cursor-pointer flex items-center gap-4 ${isResolved ? 'opacity-70' : ''}">
+                            <!-- Thumbnail / Emoji -->
+                            <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-peach-50 border border-peach-100 flex items-center justify-center shrink-0 overflow-hidden relative">
+                                ${post.imageUrl 
+                                    ? `<img src="${post.imageUrl}" alt="${post.title}" class="w-full h-full object-cover" onerror="this.style.display='none'; this.nextElementSibling.classList.remove('hidden');">`
+                                    : ''
+                                }
+                                <span class="text-3xl ${post.imageUrl ? 'hidden' : ''}">${post.presetEmoji || catMeta.icon}</span>
                             </div>
 
-                            <!-- Details -->
+                            <!-- List Details -->
                             <div class="flex-grow min-w-0 space-y-1">
-                                <div class="flex items-center gap-2">
+                                <div class="flex items-center gap-2 flex-wrap">
                                     ${badgeHTML}
-                                    <span class="text-xs font-medium text-indigo-600 truncate">${post.category}</span>
+                                    <span class="text-[11px] font-bold px-2 py-0.5 rounded-full ${catMeta.color} border">${post.category}</span>
                                 </div>
-                                <h3 class="font-bold text-slate-900 text-sm sm:text-base truncate group-hover:text-indigo-600 transition">${post.title}</h3>
-                                <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-500 pt-1">
-                                    <span class="flex items-center gap-1">
-                                        <i data-lucide="map-pin" class="w-3.5 h-3.5 text-slate-400"></i>
-                                        ${post.location}
-                                    </span>
-                                    <span class="flex items-center gap-1">
-                                        <i data-lucide="calendar" class="w-3.5 h-3.5 text-slate-400"></i>
-                                        ${post.date}
-                                    </span>
+                                <h3 class="font-bold text-slate-800 text-sm sm:text-base truncate group-hover:text-peach-500 transition">${escapeHtml(post.title)}</h3>
+                                <div class="flex flex-wrap items-center gap-x-4 text-xs text-slate-400">
+                                    <span>📍 ${escapeHtml(post.location)}</span>
+                                    <span>📅 ${post.date}</span>
                                 </div>
                             </div>
 
-                            <!-- Right Arrow Icon -->
-                            <div class="pr-2 text-slate-300 group-hover:text-indigo-600 transition">
+                            <!-- Arrow -->
+                            <div class="pr-2 text-slate-300 group-hover:text-peach-400 transition">
                                 <i data-lucide="chevron-right" class="w-5 h-5"></i>
                             </div>
                         </div>
@@ -736,32 +792,50 @@
 
             currentDetailPostId = postId;
 
-            // Set Modal Details
             const isResolved = post.status === 'resolved';
             const isLost = post.type === 'lost';
+            const catMeta = CATEGORY_MAP[post.category] || CATEGORY_MAP['기타'];
 
+            // Status Badge Setup
             const modalTypeBadge = document.getElementById('modalTypeBadge');
             if (isResolved) {
-                modalTypeBadge.className = 'px-2.5 py-1 rounded-md text-xs font-semibold bg-emerald-100 text-emerald-700';
-                modalTypeBadge.innerText = '찾음 완료';
+                modalTypeBadge.className = 'px-3 py-1 rounded-full text-xs font-bold bg-mint-100 text-mint-600 border border-mint-300';
+                modalTypeBadge.innerText = '🎉 찾기 완료됨';
             } else if (isLost) {
-                modalTypeBadge.className = 'px-2.5 py-1 rounded-md text-xs font-semibold bg-rose-100 text-rose-700';
-                modalTypeBadge.innerText = '분실 게시글';
+                modalTypeBadge.className = 'px-3 py-1 rounded-full text-xs font-bold bg-peach-100 text-peach-600 border border-peach-200';
+                modalTypeBadge.innerText = '😭 분실물 게시글';
             } else {
-                modalTypeBadge.className = 'px-2.5 py-1 rounded-md text-xs font-semibold bg-blue-100 text-blue-700';
-                modalTypeBadge.innerText = '습득 게시글';
+                modalTypeBadge.className = 'px-3 py-1 rounded-full text-xs font-bold bg-butter-100 text-amber-800 border border-butter-300';
+                modalTypeBadge.innerText = '🎁 습득물 게시글';
             }
 
+            // Resolve Button text state
+            resolveBtnText.innerText = isResolved ? '다시 찾기 중으로 변경' : '찾음 완료하기!';
+
             document.getElementById('modalTitle').innerText = post.title;
-            document.getElementById('modalCategory').innerText = post.category;
+            document.getElementById('modalCategory').innerText = `${catMeta.icon} ${post.category}`;
+            document.getElementById('modalCategory').className = `inline-block px-2.5 py-0.5 rounded-full text-xs font-bold ${catMeta.color} border mb-1`;
             document.getElementById('modalLocation').innerText = post.location;
             document.getElementById('modalDate').innerText = post.date;
             document.getElementById('modalContact').innerText = post.contact;
             document.getElementById('modalDescription').innerText = post.description;
             document.getElementById('modalCreatedAt').innerText = post.createdAt;
-            document.getElementById('modalImage').src = post.imageUrl;
 
-            // Render Comments
+            // Handle Image or Emoji Illustration
+            const imgEl = document.getElementById('modalImage');
+            const emojiEl = document.getElementById('modalEmoji');
+
+            if (post.imageUrl) {
+                imgEl.src = post.imageUrl;
+                imgEl.classList.remove('hidden');
+                emojiEl.classList.add('hidden');
+            } else {
+                imgEl.classList.add('hidden');
+                emojiEl.innerText = post.presetEmoji || catMeta.icon;
+                emojiEl.classList.remove('hidden');
+            }
+
+            // Render Comments list
             renderDetailComments(post.comments || []);
 
             detailModal.classList.remove('hidden');
@@ -773,33 +847,34 @@
             document.getElementById('commentCount').innerText = comments.length;
 
             if (comments.length === 0) {
-                commentsList.innerHTML = `<p class="text-xs text-slate-400 py-2 text-center">등록된 댓글이 없습니다. 첫 댓글을 남겨보세요!</p>`;
+                commentsList.innerHTML = `<div class="text-center py-4 bg-slate-50 rounded-2xl border border-dashed border-slate-200 text-xs text-slate-400">아직 댓글이 없어요. 따뜻한 제보나 문의글을 남겨보세요! 🌸</div>`;
                 return;
             }
 
             commentsList.innerHTML = comments.map(c => `
-                <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 text-xs space-y-1">
+                <div class="bg-peach-50/50 p-3 rounded-2xl border border-peach-100 text-xs space-y-1">
                     <div class="flex justify-between items-center">
-                        <span class="font-bold text-slate-800">${escapeHtml(c.author)}</span>
-                        <span class="text-[10px] text-slate-400">${c.createdAt}</span>
+                        <span class="font-bold text-slate-800 flex items-center gap-1">
+                            <span>🐾</span> ${escapeHtml(c.author)}
+                        </span>
+                        <span class="text-[10px] text-slate-400 font-num">${c.createdAt}</span>
                     </div>
-                    <p class="text-slate-600 leading-relaxed">${escapeHtml(c.text)}</p>
+                    <p class="text-slate-600 leading-relaxed pl-5">${escapeHtml(c.text)}</p>
                 </div>
             `).join('');
         }
 
-        // Utility: Toast Message
+        // Cute Toast Notification Helper
         function showToast(message) {
             const toastContainer = document.getElementById('toastContainer');
             const toast = document.createElement('div');
-            toast.className = 'bg-slate-900 text-white text-xs sm:text-sm px-4 py-3 rounded-xl shadow-lg border border-slate-700/50 flex items-center gap-2 transform transition-all duration-300 translate-y-4 opacity-0 pointer-events-auto';
+            toast.className = 'bg-slate-800/90 backdrop-blur-md text-white text-xs font-bold px-4 py-3 rounded-2xl shadow-xl border border-slate-700/50 flex items-center gap-2 transform transition-all duration-300 translate-y-4 opacity-0 pointer-events-auto';
             toast.innerHTML = `
-                <i data-lucide="info" class="w-4 h-4 text-indigo-400"></i>
+                <span>🌸</span>
                 <span>${escapeHtml(message)}</span>
             `;
             
             toastContainer.appendChild(toast);
-            lucide.createIcons();
 
             setTimeout(() => {
                 toast.classList.remove('translate-y-4', 'opacity-0');
@@ -808,15 +883,15 @@
             setTimeout(() => {
                 toast.classList.add('opacity-0', 'translate-y-2');
                 setTimeout(() => toast.remove(), 300);
-            }, 3000);
+            }, 3200);
         }
 
-        // Utility: XSS Defense
+        // XSS Prevention Utility
         function escapeHtml(str) {
             if (!str) return '';
             return str.replace(/&/g, "&amp;")
                       .replace(/</g, "&lt;")
-                      .replace(/>/g, "& letters;")
+                      .replace(/>/g, "&gt;")
                       .replace(/"/g, "&quot;")
                       .replace(/'/g, "&#039;");
         }
