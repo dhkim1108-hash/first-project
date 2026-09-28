@@ -4,13 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>몽글 AI 챗봇 🐾 | Bubble AI Chat</title>
-    <!-- Tailwind CSS -->
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
-    <!-- Marked.js for Markdown parsing -->
+    <!-- Marked.js for Markdown Support -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <!-- Google Fonts -->
+    <!-- Google Fonts: Gaegu (Cute Korean), Gowun Dodum, Nunito -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&family=Gowun+Dodum&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
@@ -44,44 +44,42 @@
             font-family: 'Gowun Dodum', sans-serif;
         }
 
-        /* Light Mode Pattern */
+        /* Light Mode Cute Dot Pattern */
         body.light-mode {
             background-color: #FFFDF9;
-            background-image: radial-gradient(#F3E8FF 1px, transparent 1px), radial-gradient(#FFE8E5 1px, #FFFDF9 1px);
-            background-size: 40px 40px;
-            background-position: 0 0, 20px 20px;
+            background-image: radial-gradient(#F3E8FF 1.5px, transparent 1.5px), radial-gradient(#FFE8E5 1.5px, #FFFDF9 1.5px);
+            background-size: 36px 36px;
+            background-position: 0 0, 18px 18px;
         }
 
-        /* Dark Mode Pattern */
+        /* Dark Mode Dot Pattern */
         body.dark {
             background-color: #12141C;
-            background-image: radial-gradient(#2E3448 1px, transparent 1px), radial-gradient(#1E2230 1px, #12141C 1px);
-            background-size: 40px 40px;
-            background-position: 0 0, 20px 20px;
+            background-image: radial-gradient(#2E3448 1.5px, transparent 1.5px), radial-gradient(#1E2230 1.5px, #12141C 1.5px);
+            background-size: 36px 36px;
+            background-position: 0 0, 18px 18px;
         }
 
-        /* Cute Bouncy Hover Animations */
+        /* Animations */
         .bounce-hover {
             transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s ease;
         }
         .bounce-hover:hover {
             transform: translateY(-2px) scale(1.02);
         }
-
         .bounce-click:active {
             transform: scale(0.95);
         }
 
-        /* Floating Mascot Animation */
         @keyframes float {
             0%, 100% { transform: translateY(0px) rotate(0deg); }
-            50% { transform: translateY(-8px) rotate(2deg); }
+            50% { transform: translateY(-7px) rotate(2deg); }
         }
         .animate-float {
             animation: float 3.5s ease-in-out infinite;
         }
 
-        /* Custom Scrollbar */
+        /* Scrollbar Styling */
         ::-webkit-scrollbar {
             width: 6px;
             height: 6px;
@@ -97,20 +95,20 @@
             background: #3B4259;
         }
 
-        /* Markdown Formatting Styles inside Chat */
+        /* Chat Markdown Styles */
         .chat-content p { margin-bottom: 0.5rem; }
         .chat-content p:last-child { margin-bottom: 0; }
         .chat-content ul { list-style-type: disc; margin-left: 1.25rem; margin-bottom: 0.5rem; }
         .chat-content ol { list-style-type: decimal; margin-left: 1.25rem; margin-bottom: 0.5rem; }
         .chat-content code {
-            background-color: rgba(255, 142, 128, 0.15);
+            background-color: rgba(255, 142, 128, 0.18);
             padding: 0.15rem 0.35rem;
             border-radius: 0.375rem;
             font-size: 0.85em;
             font-family: monospace;
         }
         .dark .chat-content code {
-            background-color: rgba(255, 255, 255, 0.15);
+            background-color: rgba(255, 255, 255, 0.18);
         }
         .chat-content pre {
             background-color: #1E2230;
@@ -121,11 +119,6 @@
             margin-top: 0.5rem;
             margin-bottom: 0.5rem;
             position: relative;
-        }
-        .chat-content pre code {
-            background-color: transparent;
-            padding: 0;
-            color: inherit;
         }
 
         /* Typing Dots Animation */
@@ -140,6 +133,10 @@
             0%, 100% { transform: translateY(0); opacity: 0.4; }
             50% { transform: translateY(-4px); opacity: 1; }
         }
+
+        /* Hide scrollbars for chips */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
 
@@ -147,31 +144,31 @@
 
     <div id="app" class="flex h-screen w-full overflow-hidden">
         
-        <!-- Mobile Sidebar Overlay Backstage -->
+        <!-- Mobile Sidebar Overlay -->
         <div id="sidebarOverlay" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-40 lg:hidden hidden transition-opacity"></div>
 
+        <!-- Sidebar -->
         <aside id="sidebar" class="fixed lg:static inset-y-0 left-0 z-50 w-80 bg-white/90 dark:bg-darkCard/95 backdrop-blur-md border-r-2 border-peach-100 dark:border-slate-800 flex flex-col justify-between transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out shadow-xl lg:shadow-none">
             
             <div class="p-5 flex flex-col h-full">
                 <!-- Sidebar Header -->
-                <div class="flex items-center justify-between mb-6">
+                <div class="flex items-center justify-between mb-5">
                     <div class="flex items-center gap-3">
                         <div class="w-10 h-10 rounded-2xl bg-peach-100 dark:bg-peach-900/30 border-2 border-peach-200 dark:border-peach-700 flex items-center justify-center text-peach-500 shadow-inner animate-float">
                             <span class="text-xl">🐾</span>
                         </div>
                         <div>
                             <h1 class="text-lg font-bold font-cute text-slate-800 dark:text-white tracking-wide">몽글 AI 챗봇</h1>
-                            <p class="text-[11px] text-slate-400">포근한 감성 AI 대화 상대</p>
+                            <p class="text-[11px] text-slate-400">자체 스마트 대화 엔진 탑재</p>
                         </div>
                     </div>
-                    <!-- Close sidebar button (Mobile) -->
                     <button id="closeSidebarBtn" class="lg:hidden p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800">
                         <i data-lucide="x" class="w-5 h-5"></i>
                     </button>
                 </div>
 
                 <!-- New Conversation Button -->
-                <button id="newChatBtn" class="w-full bounce-hover bounce-click bg-gradient-to-r from-peach-400 to-peach-500 hover:from-peach-500 hover:to-peach-600 text-white font-bold py-3 px-4 rounded-2xl shadow-lg shadow-peach-200 dark:shadow-none flex items-center justify-center gap-2 text-xs border-2 border-white/40 mb-6">
+                <button id="newChatBtn" class="w-full bounce-hover bounce-click bg-gradient-to-r from-peach-400 to-peach-500 hover:from-peach-500 hover:to-peach-600 text-white font-bold py-3 px-4 rounded-2xl shadow-md shadow-peach-200 dark:shadow-none flex items-center justify-center gap-2 text-xs border-2 border-white/40 mb-4">
                     <i data-lucide="plus-circle" class="w-4 h-4"></i>
                     <span>새 대화 시작하기</span>
                 </button>
@@ -179,18 +176,18 @@
                 <!-- AI Persona Selector List -->
                 <div class="flex-grow overflow-y-auto space-y-3 pr-1">
                     <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 px-2 flex items-center gap-1">
-                        <span>✨ AI 캐릭터 페르소나</span>
+                        <span>✨ AI 페르소나 선택</span>
                     </div>
 
                     <div id="characterList" class="space-y-2">
-                        <!-- Characters dynamically rendered here -->
+                        <!-- Dynamic Characters -->
                     </div>
                 </div>
 
                 <!-- Bottom Config & Actions -->
                 <div class="pt-4 mt-auto border-t border-peach-100 dark:border-slate-800/80 space-y-2">
                     <!-- Theme Toggle -->
-                    <button id="themeToggleBtn" class="w-full flex items-center justify-between p-3 rounded-2xl bg-peach-50/60 dark:bg-slate-800/60 hover:bg-peach-100 dark:hover:bg-slate-800 text-xs font-bold text-slate-600 dark:text-slate-300 transition">
+                    <button id="themeToggleBtn" class="w-full flex items-center justify-between p-2.5 rounded-2xl bg-peach-50/60 dark:bg-slate-800/60 hover:bg-peach-100 dark:hover:bg-slate-800 text-xs font-bold text-slate-600 dark:text-slate-300 transition">
                         <span class="flex items-center gap-2">
                             <span id="themeIcon">🌙</span>
                             <span id="themeText">다크 모드로 전환</span>
@@ -198,24 +195,31 @@
                         <span class="text-[10px] px-2 py-0.5 rounded-full bg-white dark:bg-slate-700 text-slate-400">모드</span>
                     </button>
 
-                    <!-- User Name Customization -->
-                    <div class="p-3 rounded-2xl bg-peach-50/60 dark:bg-slate-800/60 flex items-center gap-2">
-                        <span class="text-lg">👤</span>
+                    <!-- User Name Input -->
+                    <div class="p-2.5 rounded-2xl bg-peach-50/60 dark:bg-slate-800/60 flex items-center gap-2">
+                        <span class="text-base">👤</span>
                         <input type="text" id="userNameInput" value="몽글이친구" placeholder="내 이름 설정" class="w-full bg-transparent text-xs font-bold text-slate-700 dark:text-slate-200 focus:outline-none">
                     </div>
+
+                    <!-- Open Source Code Modal Button -->
+                    <button id="openCodeModalBtn" class="w-full flex items-center justify-center gap-1.5 p-2 text-xs text-indigo-500 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-950/30 rounded-xl transition font-medium">
+                        <i data-lucide="code" class="w-3.5 h-3.5"></i>
+                        <span>전체 소스코드 복사하기</span>
+                    </button>
 
                     <!-- Clear Chat Button -->
                     <button id="clearChatBtn" class="w-full flex items-center justify-center gap-1.5 p-2 text-xs text-rose-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30 rounded-xl transition font-medium">
                         <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
-                        <span>현재 대화 내용 지우기</span>
+                        <span>현재 대화 지우기</span>
                     </button>
                 </div>
             </div>
         </aside>
 
+        <!-- Main Chat Area -->
         <main class="flex-1 flex flex-col h-full min-w-0 bg-transparent">
             
-            <!-- Chat Top Header Bar -->
+            <!-- Chat Header Bar -->
             <header class="h-16 border-b border-peach-100 dark:border-slate-800 bg-white/80 dark:bg-darkCard/80 backdrop-blur-md px-4 sm:px-6 flex items-center justify-between shrink-0 z-10">
                 <div class="flex items-center gap-3">
                     <button id="openSidebarBtn" class="lg:hidden p-2 text-slate-500 hover:text-slate-700 dark:text-slate-300 rounded-xl bg-peach-50 dark:bg-slate-800">
@@ -236,27 +240,29 @@
                 <div class="flex items-center gap-2">
                     <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-mint-50 dark:bg-mint-950/40 text-mint-600 dark:text-mint-400 border border-mint-200 dark:border-mint-800">
                         <span class="w-2 h-2 rounded-full bg-mint-500 animate-pulse"></span>
-                        <span>Gemini AI 준비됨</span>
+                        <span>자체 AI 엔진 실행 중</span>
                     </span>
                 </div>
             </header>
 
+            <!-- Message Area -->
             <div id="chatMessages" class="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4">
-                <!-- Messages will be dynamically rendered here -->
+                <!-- Messages render dynamically -->
             </div>
 
-            <!-- Quick Suggestion Chips -->
-            <div class="px-4 sm:px-6 py-2 overflow-x-auto no-scrollbar flex items-center gap-2 border-t border-peach-100/50 dark:border-slate-800/50 bg-white/40 dark:bg-darkCard/30 backdrop-blur-sm" id="suggestionChips">
-                <!-- Dynamic Chips -->
+            <!-- Suggestion Quick Chips -->
+            <div class="px-4 sm:px-6 py-2.5 overflow-x-auto no-scrollbar flex items-center gap-2 border-t border-peach-100/50 dark:border-slate-800/50 bg-white/40 dark:bg-darkCard/30 backdrop-blur-sm" id="suggestionChips">
+                <!-- Dynamic Suggestion Chips -->
             </div>
 
+            <!-- Input Box -->
             <div class="p-3 sm:p-4 bg-white/80 dark:bg-darkCard/80 backdrop-blur-md border-t border-peach-100 dark:border-slate-800 shrink-0">
                 <form id="chatForm" class="max-w-4xl mx-auto flex items-center gap-2">
                     <div class="relative flex-1 bg-peach-50/80 dark:bg-slate-800/80 rounded-2xl border-2 border-peach-100 dark:border-slate-700 focus-within:border-peach-400 dark:focus-within:border-peach-500 transition shadow-inner">
                         <textarea 
                             id="userInput" 
                             rows="1" 
-                            placeholder="몽글이에게 마음을 전해보세요..." 
+                            placeholder="몽글이에게 마음이나 궁금한 점을 적어보세요..." 
                             class="w-full px-4 py-3 bg-transparent text-sm text-slate-800 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none resize-none max-h-32 leading-relaxed"
                         ></textarea>
                     </div>
@@ -270,25 +276,39 @@
                     </button>
                 </form>
                 <div class="mt-1.5 text-center text-[10px] text-slate-400">
-                    몽글이는 실수할 수 있어요. 답변 내용을 필요 시 확인해주세요! 🌸
+                    몽글이는 똑같은 말 대신 무작위 패턴과 연관 대화를 조합해 응답해요! 🌸
                 </div>
             </div>
 
         </main>
     </div>
 
-    <script type="importmap">
-    {
-        "imports": {
-            "@google/genai": "https://esm.run/@google/genai"
-        }
-    }
-    </script>
+    <!-- Code Viewer Modal -->
+    <div id="codeModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white dark:bg-darkCard rounded-3xl max-w-3xl w-full max-h-[85vh] flex flex-col border-2 border-peach-200 dark:border-slate-700 shadow-2xl overflow-hidden">
+            <div class="p-4 border-b border-peach-100 dark:border-slate-800 flex items-center justify-between bg-peach-50 dark:bg-slate-800">
+                <div class="flex items-center gap-2">
+                    <span class="text-xl">💻</span>
+                    <h3 class="font-bold text-sm text-slate-800 dark:text-white">몽글 AI 챗봇 전체 소스코드</h3>
+                </div>
+                <button id="closeCodeModalBtn" class="p-1 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <div class="p-4 flex-1 overflow-y-auto font-mono text-xs bg-slate-900 text-emerald-400 relative">
+                <pre id="codeDisplayArea" class="whitespace-pre-wrap break-all"></pre>
+            </div>
+            <div class="p-3 border-t border-peach-100 dark:border-slate-800 flex justify-end gap-2 bg-white dark:bg-darkCard">
+                <button id="copyCodeBtn" class="px-4 py-2 bg-peach-500 hover:bg-peach-600 text-white font-bold text-xs rounded-xl flex items-center gap-1.5 bounce-hover bounce-click">
+                    <i data-lucide="copy" class="w-4 h-4"></i>
+                    <span>코드 전체 복사하기</span>
+                </button>
+            </div>
+        </div>
+    </div>
 
-    <script type="module">
-        import { GoogleGenAI } from '@google/genai';
-
-        // AI Personas Definition
+    <script>
+        // Character Profiles
         const CHARACTERS = [
             {
                 id: 'monggle',
@@ -296,8 +316,7 @@
                 avatar: '🐾',
                 tagline: 'Warm & Helpful',
                 description: '무엇이든 다정하고 포근하게 답변해주는 몽글이 마스코트예요.',
-                systemInstruction: '당신은 "몽글이"라는 이름의 귀엽고 다정한 AI 마스코트입니다. 항상 따뜻하고 다정하게 말하며, 문장 끝에 "몽글!", "🐾", "🌸" 같은 귀여운 표현이나 이모지를 적절히 사용하세요.',
-                suggestions: ['오늘 기분이 유난히 우울해 😭', '따뜻한 응원의 한마디 해줘!', '주말에 뭐하고 놀면 좋을까?']
+                suggestions: ['오늘 기분이 우울해 😭', '지갑을 잃어버렸어 어쩌지?', '오늘 저녁 메뉴 추천해줘!', '심심한데 퀴즈 내줘!']
             },
             {
                 id: 'counselor',
@@ -305,40 +324,117 @@
                 avatar: '🧸',
                 tagline: 'Empathetic Counselor',
                 description: '지친 마음을 따뜻하게 경청하고 감싸주는 공감 전문 상담사입니다.',
-                systemInstruction: '당신은 수용적이고 공감 능력 가득한 심리 상담사입니다. 사용자의 감정을 깊이 경청하고 비판 없이 다정하게 받아주세요.',
-                suggestions: ['요즘 일 때문에 스트레스를 너무 많이 받아', '마음이 불안할 때 가라앉히는 법 알려줘', '나 스스로가 자꾸 부족하게 느껴져']
+                suggestions: ['스트레스가 너무 심해', '마음이 불안할 때 좋은 팁 있어?', '나 스스로가 자꾸 부족하게 느껴져']
             },
             {
-                id: 'summarizer',
-                name: '족집게 요약가',
-                avatar: '📑',
-                tagline: 'Summarizer Expert',
-                description: '긴 글이나 복잡한 내용을 명확하게 3줄로 핵심 요약해 드립니다.',
-                systemInstruction: '당신은 명쾌한 요약 전문가입니다. 사용자가 전달하는 글이나 주제를 불렛 포인트와 핵심 키워드로 깔끔하게 구조화하여 요약해 주세요.',
-                suggestions: ['인공지능의 역사에 대해 간단히 요약해줘', '업무 효율 올리는 핵심 팁 3가지', '블록체인의 기본 개념 정리해줘']
+                id: 'detective',
+                name: '분실물 탐정 몽',
+                avatar: '🔍',
+                tagline: 'Lost & Found Expert',
+                description: '잃어버린 물건을 기억해내는 체계적인 분실물 조언가입니다.',
+                suggestions: ['에어팟을 잃어버렸어!', '지갑/카드 분실했을 때 순서', '핸드폰 집에서 못 찾겠어']
             },
             {
-                id: 'english_tutor',
-                name: '영어 회화 튜터',
-                avatar: '🇬🇧',
-                tagline: 'English Tutor',
-                description: '자연스러운 영어 표현을 친절히 교정해주고 회화를 함께 연습해요.',
-                systemInstruction: 'You are a friendly English conversation tutor. Respond in concise English, correct any mistakes gently, and explain key Korean meanings if helpful.',
-                suggestions: ['Let\'s practice order coffee in English!', 'How can I say "퇴근길이라 차가 막혀요" in natural English?', 'Recommend 3 good idioms for daily conversations.']
+                id: 'quizmaster',
+                name: '퀴즈왕 몽글이',
+                avatar: '💡',
+                tagline: 'Fun Quiz & Trivia',
+                description: '넌센스 퀴즈부터 상식 퀴즈까지 재미있는 게임을 함께해요.',
+                suggestions: ['재미있는 넌센스 퀴즈 내줘!', '상식 퀴즈 하나 볼까?', '칭찬 한마디 해줘!']
             }
         ];
 
-        // State Management
+        // Advanced Keyword Pattern Database with Dynamic Random Combinations
+        const RESPONSES_DATABASE = [
+            {
+                keywords: ['안녕', '반가워', '하이', 'hello', 'hi', '좋은 아침', '굿모닝'],
+                replies: [
+                    "안녕하세요 {user}님! 오늘도 찾아와 주셔서 정말 반가워요 🌸 오늘은 어떤 기분으로 하루를 보내고 계신가요?",
+                    "몽글몽글~! 반가워요 {user}님! 🐾 몽글이는 언제나 {user}님을 기다리고 있었답니다!",
+                    "반갑습니다 {user}님! 햇살처럼 따뜻한 인사를 나누니 기분이 정말 좋아져요 ✨"
+                ]
+            },
+            {
+                keywords: ['우울', '슬퍼', '눈물', '속상', '힘들어', '지쳐', '괴로워', '우울해'],
+                replies: [
+                    "아이고... {user}님의 마음이 많이 무거우셨군요. 🥺 때로는 아무것도 하지 않고 마음을 편히 놓아주는 시간도 꼭 필요해요. 몽글이가 옆에서 들어줄게요.",
+                    "슬프거나 힘들 땐 억참지 않고 마음을 털어놓아도 돼요. {user}님은 이미 충분히 잘하고 계시고 소중한 사람이랍니다. 🌸 토닥토닥...",
+                    "많이 지치셨죠? 푹 쉬면서 따뜻한 차 한 잔 마셔보는 건 어떨까요? 힘든 일은 몽글이에게 살짝 내려놓으세요 🐾"
+                ]
+            },
+            {
+                keywords: ['잃어버', '분실', '지갑', '에어팟', '폰', '핸드폰', '카드', '어디'],
+                replies: [
+                    "아차! 물건을 잃어버리셨군요 😭 당황하지 말고 차근차근 떠올려봐요!\n1. **최근 갔던 경로 되짚기** (카페, 버스, 식당)\n2. **카드가 있다면 바로 일시정지 신청**\n3. **경찰청 유실물 통합포털(LOST112)** 확인하기!\n몽글이가 꼭 찾을 수 있기를 기도할게요 🔍",
+                    "분실물 발생 긴급 대처 팁! 🐾\n• **에어팟/아이폰/갤럭시**: '나의 찾기'나 'SmartThings Find' 앱 접속하기!\n• **지갑/신분증**: 자주 입는 외투 주머니나 가방 속 깊은 칸 다시 한 번 찾아보기!\n너무 걱정 마시고 차분히 찾아보세요!",
+                    "어머나! 어디서 마지막으로 사용하셨는지 기억나시나요? 몽글이랑 같이 기억을辿어봐요! 주머니나 가방 바닥도 꼭 확인해보세요 ✨"
+                ]
+            },
+            {
+                keywords: ['음식', '메뉴', '점심', '저녁', '배고파', '뭐 먹지', '맛있는'],
+                replies: [
+                    "오늘의 몽글이 추천 메뉴! 🍱\n✨ **따뜻한 국물**: 가쓰오 우동이나 칼칼한 김치찌개\n✨ **든든한 한 끼**: 바삭한 돈가스나 비빔밥\n✨ **간편한 신메뉴**: 떡볶이와 튀김 조합!\n{user}님은 어떤 스타일이 당기시나요?",
+                    "배고플 땐 역시 맛있는 걸 먹어야 행복하죠! 🍕 오늘 저녁은 파스타나 고소한 삼겹살 어떠신가요? 맛있는 음식으로 힐링하세요!",
+                    "음, 몽글이의 원픽은 달콤 고소한 계란볶음밥이에요! 아니면 속이 든든해지는 포근한 뚝배기 국밥도 추천드려요 🐾"
+                ]
+            },
+            {
+                keywords: ['날씨', '비', '눈', '춥다', '덥다', '바람', '우산'],
+                replies: [
+                    "오늘 날씨 체크해보셨나요? ☀️ 외출하실 때는 감기 걸리지 않게 옷차림 신경 쓰시고, 혹시 모르니 작은 접이식 우산도 챙기시면 좋답니다!",
+                    "바람이나 날씨가 차가울 땐 따뜻한 음료가 최고죠! ☕️ {user}님, 오늘 외출하실 때 따뜻하게 입으셨나요?",
+                    "포근포근한 날씨처럼 {user}님의 마음에도 따사로운 햇살이 가득하기를 바랄게요 🌸"
+                ]
+            },
+            {
+                keywords: ['퀴즈', '문제', '심심', '놀자', '게임', '넌센스'],
+                replies: [
+                    "재미있는 넌센스 퀴즈 하나 나갑니다! 💡\n**Q. 세상에서 가장 슬픈 파는 무슨 파일까요?**\n\n(정답을 아시겠다면 아무 말이나 입력해보세요! 정답: '파X' 또는 '대파'?) 🤭",
+                    "심심할 땐 몽글이랑 스피드 퀴즈! 💡\n**Q. 왕이 넘어지면 뭐가 될까요?**\n\n정답은 바로... **'킹콩'**입니다!! 히히 😆 재미있으셨나요?",
+                    "심심하시군요! 그렇다면 몽글이가 깜짝 상식 퀴즈 내볼게요 ✏️\n**Q. 세계에서 가장 큰 바다는 어디일까요?**\n(힌트: 太平洋)"
+                ]
+            },
+            {
+                keywords: ['칭찬', '멋져', '최고', '귀여워', '고마워', '감사', '좋아'],
+                replies: [
+                    "헤헤, 그렇게 말씀해주시니 몽글이 마음이 살랑살랑 기뻐요! 🥰 {user}님 덕분에 오늘 하루가 훨씬 행복해졌어요 🌸",
+                    "고마워요 {user}님! {user}님이야말로 정말 다정하고 따뜻한 분이에요 ✨ 몽글이는 언제나 {user} 편인 거 아시죠?",
+                    "몽글이도 {user}님이 정말 좋아요! 🐾 언제든 이야기를 나누고 싶을 때 찾아와주세요!"
+                ]
+            },
+            {
+                keywords: ['공부', '시험', '숙제', '과제', '일', '야근', '자격증'],
+                replies: [
+                    "열심히 달려가고 계신 {user}님 정말 대단해요! 👏 하지만 연속해서 공부하거나 일하면 효율이 떨어지니 50분 일하고 10분은 꼭 눈을 식혀주세요!",
+                    "포기하지 않고 노력하는 과정 자체가 이미 멋진 결실이에요. {user}님의 노력이 꼭 빛을 발할 거예요! 몽글이가 열렬히 응원할게요 🔥",
+                    "자물쇠도 열쇠가 있듯 차분하게 해결하면 다 풀릴 거예요! 조급해하지 말고 잠시 스트레칭 한 번 해주세요 🧘‍♂️"
+                ]
+            },
+            {
+                keywords: ['비밀', '고민', '이야기', '상담', '말못할'],
+                replies: [
+                    "몽글이에게는 어떤 비밀 이야기든 안심하고 털어놓으셔도 돼요. 🔒 절대 어디에도 말하지 않는 든든한 비밀 친구가 되어드릴게요.",
+                    "속에만 담아두면 마음이 아파요. 몽글이에게 가볍게 불평해보는 것도 좋아요. 다 들어드릴게요 🧸",
+                    "언제나 이곳에서 {user}님의 이야기를 들을 준비가 되어 있답니다. 편하게 말씀해주세요."
+                ]
+            }
+        ];
+
+        // Generic Dynamic Fallback Templates to ensure never repetitive
+        const FALLBACK_TEMPLATES = [
+            "그렇군요! {user}님의 말씀을 듣다 보니 정말 흥미로워요. 🌸 혹시 이에 대해 더 나누고 싶은 이야기가 있으신가요?",
+            "{user}님과 대화하는 시간은 늘 포근하고 즐거워요 🐾 방금 하신 말씀에 대해 몽글이도 깊이 생각해보게 되네요!",
+            "아하! {user}님의 말씀 속에 깊은 뜻이 담겨 있군요 ✨ 오늘 다른 재미있는 일이나 고민은 없으셨나요?",
+            "몽글이는 항상 {user}님의 이야기를 경청하고 있어요 🧸 더 자세한 이야기나 다른 질문이 있다면 언제든 편하게 말해줘요!",
+            "와우, 정말 좋은 주제네요! 🐾 {user}님의 생각을 들을 수 있어서 기뻐요. 오늘도 기분 좋은 일들만 가득했으면 좋겠어요!"
+        ];
+
+        // Global State
         let currentCharacter = CHARACTERS[0];
-        let chatHistory = []; // Array of { id, role, text, timestamp }
+        let chatHistory = [];
         let isDarkMode = false;
         let userName = '몽글이친구';
         let isGenerating = false;
-
-        // Initialize Gemini API Client
-        // Note: process.env.GEMINI_API_KEY is handled seamlessly via SDK environment binding
-        const apiKey = typeof process !== 'undefined' && process.env && process.env.GEMINI_API_KEY ? process.env.GEMINI_API_KEY : '';
-        const ai = new GoogleGenAI({ apiKey: apiKey });
 
         // DOM Elements
         const characterList = document.getElementById('characterList');
@@ -356,12 +452,20 @@
         const clearChatBtn = document.getElementById('clearChatBtn');
         const newChatBtn = document.getElementById('newChatBtn');
 
-        // Sidebar elements
+        // Sidebar Elements
         const sidebar = document.getElementById('sidebar');
         const sidebarOverlay = document.getElementById('sidebarOverlay');
         const openSidebarBtn = document.getElementById('openSidebarBtn');
         const closeSidebarBtn = document.getElementById('closeSidebarBtn');
 
+        // Modal Elements
+        const codeModal = document.getElementById('codeModal');
+        const openCodeModalBtn = document.getElementById('openCodeModalBtn');
+        const closeCodeModalBtn = document.getElementById('closeCodeModalBtn');
+        const copyCodeBtn = document.getElementById('copyCodeBtn');
+        const codeDisplayArea = document.getElementById('codeDisplayArea');
+
+        // Init App
         window.addEventListener('DOMContentLoaded', () => {
             renderCharacterList();
             setupEventListeners();
@@ -370,7 +474,7 @@
         });
 
         function setupEventListeners() {
-            // Mobile Sidebar Toggles
+            // Sidebar logic
             openSidebarBtn.addEventListener('click', () => {
                 sidebar.classList.remove('-translate-x-full');
                 sidebarOverlay.classList.remove('hidden');
@@ -384,7 +488,7 @@
                 sidebarOverlay.classList.add('hidden');
             }
 
-            // Theme Toggle
+            // Theme Switcher
             themeToggleBtn.addEventListener('click', () => {
                 isDarkMode = !isDarkMode;
                 if (isDarkMode) {
@@ -400,18 +504,16 @@
                 }
             });
 
-            // User Name Change
+            // User Name Sync
             userNameInput.addEventListener('change', (e) => {
                 userName = e.target.value.trim() || '몽글이친구';
             });
 
-            // Clear Chat History
+            // Reset Chat
             clearChatBtn.addEventListener('click', () => {
-                if (confirm('현재 대화 내용을 모두 지울까요? 🌸')) {
-                    chatHistory = [];
-                    renderMessages();
-                    addWelcomeMessage();
-                }
+                chatHistory = [];
+                renderMessages();
+                addWelcomeMessage();
             });
 
             newChatBtn.addEventListener('click', () => {
@@ -421,7 +523,29 @@
                 closeSidebar();
             });
 
-            // Textarea auto-resize
+            // Code Modal Events
+            openCodeModalBtn.addEventListener('click', () => {
+                codeDisplayArea.textContent = document.documentElement.outerHTML;
+                codeModal.classList.remove('hidden');
+            });
+
+            closeCodeModalBtn.addEventListener('click', () => {
+                codeModal.classList.add('hidden');
+            });
+
+            copyCodeBtn.addEventListener('click', () => {
+                const fullCode = document.documentElement.outerHTML;
+                navigator.clipboard.writeText(fullCode).then(() => {
+                    copyCodeBtn.innerHTML = `<i data-lucide="check" class="w-4 h-4"></i><span>복사 완료! ✨</span>`;
+                    lucide.createIcons();
+                    setTimeout(() => {
+                        copyCodeBtn.innerHTML = `<i data-lucide="copy" class="w-4 h-4"></i><span>코드 전체 복사하기</span>`;
+                        lucide.createIcons();
+                    }, 2000);
+                });
+            });
+
+            // Auto Expand Textarea
             userInput.addEventListener('input', () => {
                 userInput.style.height = 'auto';
                 userInput.style.height = Math.min(userInput.scrollHeight, 120) + 'px';
@@ -433,7 +557,7 @@
                 handleSendMessage();
             });
 
-            // Enter key to send (Shift+Enter for newline)
+            // Enter Key
             userInput.addEventListener('keydown', (e) => {
                 if (e.key === 'Enter' && !e.shiftKey) {
                     e.preventDefault();
@@ -478,7 +602,6 @@
             renderMessages();
             addWelcomeMessage();
 
-            // Close sidebar on mobile after selecting
             sidebar.classList.add('-translate-x-full');
             sidebarOverlay.classList.add('hidden');
         };
@@ -488,7 +611,6 @@
             activeCharName.innerText = currentCharacter.name;
             activeCharDesc.innerText = currentCharacter.description;
 
-            // Render Suggestion Chips
             suggestionChips.innerHTML = currentCharacter.suggestions.map(sug => `
                 <button 
                     onclick="sendPresetQuery('${sug.replace(/'/g, "\\'")}')" 
@@ -511,21 +633,39 @@
         }
 
         function addWelcomeMessage() {
-            const welcomeText = `안녕하세요! **${currentCharacter.name}**입니다. 🌸\n오늘 어떤 도움이 필요하신가요? 편하게 말해주세요!`;
+            const welcomeText = `안녕하세요 {user}님! **${currentCharacter.name}**입니다. 🌸\n오늘 어떤 대화를 나누고 싶으신가요? 마음 편히 말씀해주세요!`;
             chatHistory.push({
                 id: 'msg-' + Date.now(),
                 role: 'model',
-                text: welcomeText,
+                text: welcomeText.replace(/{user}/g, userName),
                 timestamp: getCurrentTime()
             });
             renderMessages();
+        }
+
+        // Smart Local Response Generator
+        function generateLocalAIResponse(userQuery) {
+            const cleanQuery = userQuery.toLowerCase().trim();
+
+            // 1. Check matching database keywords
+            for (const category of RESPONSES_DATABASE) {
+                const match = category.keywords.some(kw => cleanQuery.includes(kw));
+                if (match) {
+                    const randomReply = category.replies[Math.floor(Math.random() * category.replies.length)];
+                    return randomReply.replace(/{user}/g, userName);
+                }
+            }
+
+            // 2. Fallback to dynamic template if no explicit keyword matches
+            const randomFallback = FALLBACK_TEMPLATES[Math.floor(Math.random() * FALLBACK_TEMPLATES.length)];
+            return randomFallback.replace(/{user}/g, userName);
         }
 
         async function handleSendMessage() {
             const text = userInput.value.trim();
             if (!text || isGenerating) return;
 
-            // Add user message
+            // Add User Message
             const userMsg = {
                 id: 'msg-' + Date.now(),
                 role: 'user',
@@ -538,51 +678,24 @@
             userInput.style.height = 'auto';
             renderMessages();
 
-            // Show Typing Indicator
             isGenerating = true;
             showTypingIndicator();
 
-            try {
-                // Prepare API Payload with Google GenAI SDK
-                // Construct turn history for multi-turn conversational context
-                const contents = chatHistory.map(m => ({
-                    role: m.role === 'user' ? 'user' : 'model',
-                    parts: [{ text: m.text }]
-                }));
-
-                const response = await ai.models.generateContent({
-                    model: 'gemini-3-flash-preview',
-                    contents: contents,
-                    config: {
-                        systemInstruction: currentCharacter.systemInstruction,
-                        temperature: 0.7
-                    }
-                });
-
+            // Simulate realistic AI thought process latency (0.6 ~ 1.2 sec)
+            setTimeout(() => {
                 removeTypingIndicator();
+                const responseText = generateLocalAIResponse(text);
 
-                const aiText = response.text || '죄송해요, 잠시 생각을 정돈하지 못했어요 몽글... 다시 말씀해주실 수 있나요? 🐾';
-                
                 chatHistory.push({
                     id: 'msg-' + Date.now(),
                     role: 'model',
-                    text: aiText,
+                    text: responseText,
                     timestamp: getCurrentTime()
                 });
 
-            } catch (err) {
-                console.error('Gemini API Error:', err);
-                removeTypingIndicator();
-                chatHistory.push({
-                    id: 'msg-' + Date.now(),
-                    role: 'model',
-                    text: '⚠️ 몽글이와의 연결이 잠시 불안정해요. 잠시 후 다시 시도해보세요!',
-                    timestamp: getCurrentTime()
-                });
-            } finally {
                 isGenerating = false;
                 renderMessages();
-            }
+            }, Math.floor(Math.random() * 600) + 600);
         }
 
         function renderMessages() {
@@ -616,8 +729,6 @@
                 `;
             }).join('');
 
-            // Code Block Copy Button Helper
-            setupCodeCopyButtons();
             scrollToBottom();
         }
 
@@ -645,25 +756,6 @@
 
         function scrollToBottom() {
             chatMessages.scrollTop = chatMessages.scrollHeight;
-        }
-
-        function setupCodeCopyButtons() {
-            const pres = chatMessages.querySelectorAll('pre');
-            pres.forEach(pre => {
-                if (pre.querySelector('.copy-btn')) return;
-
-                const btn = document.createElement('button');
-                btn.className = 'copy-btn absolute top-2 right-2 px-2 py-1 text-[10px] font-bold bg-slate-700 text-slate-200 rounded-md hover:bg-slate-600 transition opacity-80 hover:opacity-100';
-                btn.innerText = '복사 📋';
-                btn.onclick = () => {
-                    const code = pre.querySelector('code')?.innerText || pre.innerText;
-                    navigator.clipboard.writeText(code);
-                    btn.innerText = '완료! ✨';
-                    setTimeout(() => btn.innerText = '복사 📋', 2000);
-                };
-                pre.style.position = 'relative';
-                pre.appendChild(btn);
-            });
         }
 
         function getCurrentTime() {
