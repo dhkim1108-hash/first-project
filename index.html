@@ -3,35 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>몽글몽글 분실물 센터 🐾</title>
+    <title>몽글 AI 챗봇 🐾 | Bubble AI Chat</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
-    <!-- Google Fonts: Gaegu & Nunito/Pretendard -->
+    <!-- Marked.js for Markdown parsing -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&family=Gowun+Dodum&family=Nunito:wght@600;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&family=Gowun+Dodum&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
 
     <script>
         tailwind.config = {
+            darkMode: 'class',
             theme: {
                 extend: {
                     colors: {
                         cream: '#FFFDF9',
-                        peach: { 50: '#FFF5F3', 100: '#FFE8E5', 200: '#FFD3CD', 400: '#FF8E80', 500: '#FF6B5B' },
+                        darkBg: '#12141C',
+                        darkCard: '#1E2230',
+                        peach: { 50: '#FFF5F3', 100: '#FFE8E5', 200: '#FFD3CD', 400: '#FF8E80', 500: '#FF6B5B', 600: '#E85242' },
                         mint: { 50: '#F0FDF8', 100: '#DCFCE7', 300: '#86EFAC', 500: '#34D399', 600: '#10B981' },
                         butter: { 100: '#FEF9C3', 300: '#FDE047', 400: '#FACC15' },
-                        lavender: { 100: '#F3E8FF', 200: '#E9D5FF', 400: '#C084FC', 500: '#A855F7' }
+                        lavender: { 50: '#FAF5FF', 100: '#F3E8FF', 200: '#E9D5FF', 400: '#C084FC', 500: '#A855F7', 600: '#9333EA' }
                     },
                     fontFamily: {
                         cute: ['Gaegu', 'cursive'],
                         body: ['Gowun Dodum', 'sans-serif'],
                         num: ['Nunito', 'sans-serif']
-                    },
-                    borderRadius: {
-                        '3xl': '1.8rem',
-                        '4xl': '2.4rem'
                     }
                 }
             }
@@ -41,8 +42,20 @@
     <style>
         body {
             font-family: 'Gowun Dodum', sans-serif;
+        }
+
+        /* Light Mode Pattern */
+        body.light-mode {
             background-color: #FFFDF9;
             background-image: radial-gradient(#F3E8FF 1px, transparent 1px), radial-gradient(#FFE8E5 1px, #FFFDF9 1px);
+            background-size: 40px 40px;
+            background-position: 0 0, 20px 20px;
+        }
+
+        /* Dark Mode Pattern */
+        body.dark {
+            background-color: #12141C;
+            background-image: radial-gradient(#2E3448 1px, transparent 1px), radial-gradient(#1E2230 1px, #12141C 1px);
             background-size: 40px 40px;
             background-position: 0 0, 20px 20px;
         }
@@ -52,848 +65,610 @@
             transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s ease;
         }
         .bounce-hover:hover {
-            transform: translateY(-5px) scale(1.02);
+            transform: translateY(-2px) scale(1.02);
         }
 
         .bounce-click:active {
             transform: scale(0.95);
         }
 
-        /* Floating Animation for Mascot */
+        /* Floating Mascot Animation */
         @keyframes float {
             0%, 100% { transform: translateY(0px) rotate(0deg); }
-            50% { transform: translateY(-10px) rotate(2deg); }
+            50% { transform: translateY(-8px) rotate(2deg); }
         }
         .animate-float {
             animation: float 3.5s ease-in-out infinite;
         }
 
-        @keyframes pulse-subtle {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
-        }
-        .animate-pulse-subtle {
-            animation: pulse-subtle 2s ease-in-out infinite;
-        }
-
         /* Custom Scrollbar */
         ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
+            width: 6px;
+            height: 6px;
         }
         ::-webkit-scrollbar-track {
-            background: #FFFDF9;
+            background: transparent;
         }
         ::-webkit-scrollbar-thumb {
             background: #FFD3CD;
             border-radius: 99px;
         }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #FF8E80;
+        .dark ::-webkit-scrollbar-thumb {
+            background: #3B4259;
         }
 
-        .no-scrollbar::-webkit-scrollbar {
-            display: none;
+        /* Markdown Formatting Styles inside Chat */
+        .chat-content p { margin-bottom: 0.5rem; }
+        .chat-content p:last-child { margin-bottom: 0; }
+        .chat-content ul { list-style-type: disc; margin-left: 1.25rem; margin-bottom: 0.5rem; }
+        .chat-content ol { list-style-type: decimal; margin-left: 1.25rem; margin-bottom: 0.5rem; }
+        .chat-content code {
+            background-color: rgba(255, 142, 128, 0.15);
+            padding: 0.15rem 0.35rem;
+            border-radius: 0.375rem;
+            font-size: 0.85em;
+            font-family: monospace;
         }
-        .no-scrollbar {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
+        .dark .chat-content code {
+            background-color: rgba(255, 255, 255, 0.15);
+        }
+        .chat-content pre {
+            background-color: #1E2230;
+            color: #F3F4F6;
+            padding: 0.75rem;
+            border-radius: 0.75rem;
+            overflow-x: auto;
+            margin-top: 0.5rem;
+            margin-bottom: 0.5rem;
+            position: relative;
+        }
+        .chat-content pre code {
+            background-color: transparent;
+            padding: 0;
+            color: inherit;
+        }
+
+        /* Typing Dots Animation */
+        .typing-dot {
+            animation: typing 1.4s infinite ease-in-out;
+        }
+        .typing-dot:nth-child(1) { animation-delay: 0s; }
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes typing {
+            0%, 100% { transform: translateY(0); opacity: 0.4; }
+            50% { transform: translateY(-4px); opacity: 1; }
         }
     </style>
 </head>
 
-<body class="text-slate-700 min-h-screen flex flex-col justify-between selection:bg-peach-200">
+<body class="light-mode text-slate-700 dark:text-slate-200 min-h-screen flex flex-col justify-between selection:bg-peach-200 transition-colors duration-300">
 
-    <!-- Header Area -->
-    <header class="sticky top-0 z-30 bg-white/85 backdrop-blur-md border-b-2 border-peach-100 shadow-sm">
-        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5">
-            <div class="flex items-center justify-between gap-3">
-                
-                <!-- Logo & Mascot -->
-                <div class="flex items-center gap-3">
-                    <div class="w-12 h-12 rounded-3xl bg-peach-100 border-2 border-peach-200 flex items-center justify-center text-peach-500 shadow-inner animate-float">
-                        <span class="text-2xl">🐾</span>
-                    </div>
-                    <div>
-                        <div class="flex items-center gap-1.5">
-                            <h1 class="text-xl sm:text-2xl font-bold font-cute text-slate-800 tracking-wide">몽글몽글 분실물 센터</h1>
-                            <span class="px-2 py-0.5 text-[10px] font-bold bg-peach-100 text-peach-500 rounded-full border border-peach-200">Ver 2.0 ✨</span>
-                        </div>
-                        <p class="text-xs text-slate-400 hidden sm:block">소중한 물건, 몽글이와 함께 따뜻하게 찾아요!</p>
-                    </div>
-                </div>
-
-                <!-- Create Post Button -->
-                <button id="openNewPostBtn" class="bounce-hover bounce-click bg-gradient-to-r from-peach-400 to-peach-500 hover:from-peach-500 hover:to-peach-600 text-white font-bold px-5 py-2.5 rounded-full shadow-lg shadow-peach-200 flex items-center gap-2 text-sm border-2 border-white">
-                    <i data-lucide="sparkles" class="w-4 h-4"></i>
-                    <span>글 쓰기</span>
-                </button>
-            </div>
-        </div>
-    </header>
-
-    <main class="flex-grow max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    <div id="app" class="flex h-screen w-full overflow-hidden">
         
-        <!-- Controls Panel -->
-        <section class="bg-white rounded-3xl p-5 shadow-sm border-2 border-peach-100 mb-6 space-y-4">
+        <!-- Mobile Sidebar Overlay Backstage -->
+        <div id="sidebarOverlay" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-40 lg:hidden hidden transition-opacity"></div>
+
+        <aside id="sidebar" class="fixed lg:static inset-y-0 left-0 z-50 w-80 bg-white/90 dark:bg-darkCard/95 backdrop-blur-md border-r-2 border-peach-100 dark:border-slate-800 flex flex-col justify-between transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out shadow-xl lg:shadow-none">
             
-            <!-- Search & View Mode + Status -->
-            <div class="flex flex-col lg:flex-row gap-3.5 items-center justify-between">
-                
-                <!-- Search Box -->
-                <div class="relative w-full lg:w-80">
-                    <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-lg">🔍</span>
-                    <input type="text" id="searchInput" placeholder="물건, 장소, 키워드로 찾아봐요..." class="w-full pl-10 pr-4 py-2.5 bg-peach-50/50 border-2 border-peach-100 rounded-2xl text-sm focus:outline-none focus:border-peach-400 transition placeholder:text-slate-300">
-                </div>
-
-                <!-- Status Tabs -->
-                <div class="flex flex-wrap items-center justify-between w-full lg:w-auto gap-2">
-                    <div class="inline-flex p-1 bg-peach-50 rounded-2xl border border-peach-100 text-xs font-bold text-slate-500" id="statusFilterGroup">
-                        <button data-status="all" class="status-tab px-3.5 py-2 rounded-xl transition bg-white text-peach-500 shadow-sm"> 전체보기</button>
-                        <button data-status="lost" class="status-tab px-3.5 py-2 rounded-xl transition hover:text-slate-800">😭 분실해요</button>
-                        <button data-status="found" class="status-tab px-3.5 py-2 rounded-xl transition hover:text-slate-800">🎁 습득했어요</button>
-                        <button data-status="resolved" class="status-tab px-3.5 py-2 rounded-xl transition hover:text-slate-800">🎉 찾았어요!</button>
-                    </div>
-
-                    <!-- View Switcher -->
-                    <div class="flex items-center bg-peach-50 p-1 rounded-2xl border border-peach-100">
-                        <button id="gridViewBtn" class="p-2 rounded-xl text-peach-500 bg-white shadow-sm transition" title="카드 형태로 보기">
-                            <i data-lucide="layout-grid" class="w-4 h-4"></i>
-                        </button>
-                        <button id="listViewBtn" class="p-2 rounded-xl text-slate-400 hover:text-slate-700 transition" title="목록으로 보기">
-                            <i data-lucide="list" class="w-4 h-4"></i>
-                        </button>
-                    </div>
-                </div>
-
-            </div>
-
-            <!-- Category Chips -->
-            <div class="pt-3 border-t border-peach-100/60">
-                <div class="flex items-center gap-2 overflow-x-auto pb-1 text-xs no-scrollbar" id="categoryFilterGroup">
-                    <button data-cat="all" class="cat-chip bounce-click px-4 py-2 rounded-2xl border-2 border-peach-400 bg-peach-100 text-peach-600 font-bold whitespace-nowrap transition flex items-center gap-1.5 shadow-sm">
-                        <span>🌈</span> 전체 카테고리
-                    </button>
-                    <button data-cat="전자기기" class="cat-chip bounce-click px-4 py-2 rounded-2xl border-2 border-slate-100 bg-slate-50 text-slate-600 hover:bg-peach-50 font-bold whitespace-nowrap transition flex items-center gap-1.5">
-                        <span>📱</span> 전자기기
-                    </button>
-                    <button data-cat="지갑/카드" class="cat-chip bounce-click px-4 py-2 rounded-2xl border-2 border-slate-100 bg-slate-50 text-slate-600 hover:bg-peach-50 font-bold whitespace-nowrap transition flex items-center gap-1.5">
-                        <span>👛</span> 지갑/카드
-                    </button>
-                    <button data-cat="가방/의류" class="cat-chip bounce-click px-4 py-2 rounded-2xl border-2 border-slate-100 bg-slate-50 text-slate-600 hover:bg-peach-50 font-bold whitespace-nowrap transition flex items-center gap-1.5">
-                        <span>🎒</span> 가방/의류
-                    </button>
-                    <button data-cat="악세사리" class="cat-chip bounce-click px-4 py-2 rounded-2xl border-2 border-slate-100 bg-slate-50 text-slate-600 hover:bg-peach-50 font-bold whitespace-nowrap transition flex items-center gap-1.5">
-                        <span>💍</span> 악세사리
-                    </button>
-                    <button data-cat="반려동물" class="cat-chip bounce-click px-4 py-2 rounded-2xl border-2 border-slate-100 bg-slate-50 text-slate-600 hover:bg-peach-50 font-bold whitespace-nowrap transition flex items-center gap-1.5">
-                        <span>🐶</span> 반려동물
-                    </button>
-                    <button data-cat="기타" class="cat-chip bounce-click px-4 py-2 rounded-2xl border-2 border-slate-100 bg-slate-50 text-slate-600 hover:bg-peach-50 font-bold whitespace-nowrap transition flex items-center gap-1.5">
-                        <span>🧸</span> 기타 물품
-                    </button>
-                </div>
-            </div>
-
-        </section>
-
-        <!-- Posts Container -->
-        <section id="postsContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-            <!-- Dynamic Post Cards loaded here -->
-        </section>
-
-        <!-- Cute Empty State (Default zero items) -->
-        <div id="emptyState" class="text-center py-16 px-6 bg-white rounded-3xl border-2 border-dashed border-peach-200 mt-2 shadow-sm">
-            <div class="relative w-28 h-28 mx-auto mb-4 flex items-center justify-center bg-peach-50 rounded-full border-2 border-peach-100 animate-float">
-                <span class="text-6xl">🌸</span>
-                <span class="absolute -bottom-1 -right-1 text-2xl">🔍</span>
-            </div>
-            <h3 class="text-xl font-bold text-slate-800 font-cute text-2xl mb-1">아직 등록된 분실물이 없어요!</h3>
-            <p class="text-xs sm:text-sm text-slate-400 max-w-sm mx-auto leading-relaxed">
-                소중한 물건을 잃어버리셨거나 주우셨나요?<br>오른쪽 상단 <strong class="text-peach-500 font-bold">'글 쓰기'</strong> 버튼을 눌러 제보해 보세요!
-            </p>
-            <button onclick="document.getElementById('openNewPostBtn').click()" class="mt-5 bounce-hover bounce-click bg-peach-100 text-peach-600 hover:bg-peach-200 px-5 py-2.5 rounded-full text-xs font-bold border border-peach-200 transition inline-flex items-center gap-1.5">
-                <span>✨ 첫 분실물 제보하러 가기</span>
-            </button>
-        </div>
-
-    </main>
-
-    <!-- New Post Modal -->
-    <div id="newPostModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm hidden">
-        <div class="bg-white rounded-3xl max-w-lg w-full max-h-[90vh] flex flex-col shadow-2xl border-4 border-peach-100 overflow-hidden transform transition-all">
-            
-            <!-- Modal Header -->
-            <div class="px-6 py-4 bg-gradient-to-r from-peach-50 to-lavender-100 border-b-2 border-peach-100 flex justify-between items-center">
-                <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2 font-cute text-xl">
-                    <span>🎀</span>
-                    <span>새로운 소식 등록하기</span>
-                </h2>
-                <button id="closeNewPostBtn" class="text-slate-400 hover:text-slate-600 p-1.5 rounded-2xl hover:bg-white transition">
-                    <i data-lucide="x" class="w-5 h-5"></i>
-                </button>
-            </div>
-
-            <!-- Form Body -->
-            <form id="postForm" class="p-6 overflow-y-auto space-y-4 text-xs sm:text-sm">
-                
-                <!-- Type Selection -->
-                <div>
-                    <label class="block font-bold text-slate-700 mb-2">어떤 소식인가요? <span class="text-peach-500">*</span></label>
-                    <div class="grid grid-cols-2 gap-3">
-                        <label class="border-2 border-slate-100 rounded-2xl p-3 flex items-center justify-center gap-2 cursor-pointer hover:bg-peach-50/50 has-[:checked]:border-peach-400 has-[:checked]:bg-peach-50 has-[:checked]:text-peach-600 font-bold text-slate-500 transition">
-                            <input type="radio" name="type" value="lost" checked class="hidden">
-                            <span>😭 분실해요 (잃어버림)</span>
-                        </label>
-                        <label class="border-2 border-slate-100 rounded-2xl p-3 flex items-center justify-center gap-2 cursor-pointer hover:bg-mint-50/50 has-[:checked]:border-mint-500 has-[:checked]:bg-mint-50 has-[:checked]:text-mint-600 font-bold text-slate-500 transition">
-                            <input type="radio" name="type" value="found" class="hidden">
-                            <span>🎁 습득했어요 (주웠음)</span>
-                        </label>
-                    </div>
-                </div>
-
-                <!-- Title -->
-                <div>
-                    <label for="postTitle" class="block font-bold text-slate-700 mb-1">제목 <span class="text-peach-500">*</span></label>
-                    <input type="text" id="postTitle" required placeholder="예: 무지개 도서관 근처에서 곰돌이 지갑 보신 분!" class="w-full px-3.5 py-2.5 bg-slate-50 border-2 border-slate-100 rounded-2xl focus:outline-none focus:border-peach-400 transition">
-                </div>
-
-                <!-- Category & Date Grid -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                        <label for="postCategory" class="block font-bold text-slate-700 mb-1">카테고리 <span class="text-peach-500">*</span></label>
-                        <select id="postCategory" required class="w-full px-3.5 py-2.5 bg-slate-50 border-2 border-slate-100 rounded-2xl focus:outline-none focus:border-peach-400 transition">
-                            <option value="전자기기">📱 전자기기</option>
-                            <option value="지갑/카드">👛 지갑/카드</option>
-                            <option value="가방/의류">🎒 가방/의류</option>
-                            <option value="악세사리">💍 악세사리</option>
-                            <option value="반려동물">🐶 반려동물</option>
-                            <option value="기타">🧸 기타</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label for="postDate" class="block font-bold text-slate-700 mb-1">날짜 <span class="text-peach-500">*</span></label>
-                        <input type="date" id="postDate" required class="w-full px-3.5 py-2.5 bg-slate-50 border-2 border-slate-100 rounded-2xl focus:outline-none focus:border-peach-400 transition">
-                    </div>
-                </div>
-
-                <!-- Location & Contact -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                        <label for="postLocation" class="block font-bold text-slate-700 mb-1">장소 <span class="text-peach-500">*</span></label>
-                        <input type="text" id="postLocation" required placeholder="예: 중앙공원 벤치 근처" class="w-full px-3.5 py-2.5 bg-slate-50 border-2 border-slate-100 rounded-2xl focus:outline-none focus:border-peach-400 transition">
-                    </div>
-                    <div>
-                        <label for="postContact" class="block font-bold text-slate-700 mb-1">연락처 / 오픈채팅 <span class="text-peach-500">*</span></label>
-                        <input type="text" id="postContact" required placeholder="010-XXXX-XXXX 또는 카톡ID" class="w-full px-3.5 py-2.5 bg-slate-50 border-2 border-slate-100 rounded-2xl focus:outline-none focus:border-peach-400 transition">
-                    </div>
-                </div>
-
-                <!-- Cute Image Picker / URL Input -->
-                <div>
-                    <label class="block font-bold text-slate-700 mb-1">사진 등록 (선택)</label>
-                    <input type="url" id="postImageUrl" placeholder="https://... 이미지 URL (미입력 시 예쁜 일러스트 자동선택)" class="w-full px-3.5 py-2.5 bg-slate-50 border-2 border-slate-100 rounded-2xl focus:outline-none focus:border-peach-400 transition text-xs mb-2">
-                    
-                    <div class="flex items-center gap-2">
-                        <span class="text-xs text-slate-400">귀여운 기본 아이콘 추천:</span>
-                        <div class="flex gap-1.5" id="presetIconPicker">
-                            <button type="button" data-preset="🧸" class="preset-btn px-2.5 py-1 rounded-xl bg-peach-50 border border-peach-200 text-sm hover:scale-110 transition">🧸</button>
-                            <button type="button" data-preset="📱" class="preset-btn px-2.5 py-1 rounded-xl bg-peach-50 border border-peach-200 text-sm hover:scale-110 transition">📱</button>
-                            <button type="button" data-preset="👛" class="preset-btn px-2.5 py-1 rounded-xl bg-peach-50 border border-peach-200 text-sm hover:scale-110 transition">👛</button>
-                            <button type="button" data-preset="🐶" class="preset-btn px-2.5 py-1 rounded-xl bg-peach-50 border border-peach-200 text-sm hover:scale-110 transition">🐶</button>
-                            <button type="button" data-preset="🔑" class="preset-btn px-2.5 py-1 rounded-xl bg-peach-50 border border-peach-200 text-sm hover:scale-110 transition">🔑</button>
+            <div class="p-5 flex flex-col h-full">
+                <!-- Sidebar Header -->
+                <div class="flex items-center justify-between mb-6">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-2xl bg-peach-100 dark:bg-peach-900/30 border-2 border-peach-200 dark:border-peach-700 flex items-center justify-center text-peach-500 shadow-inner animate-float">
+                            <span class="text-xl">🐾</span>
+                        </div>
+                        <div>
+                            <h1 class="text-lg font-bold font-cute text-slate-800 dark:text-white tracking-wide">몽글 AI 챗봇</h1>
+                            <p class="text-[11px] text-slate-400">포근한 감성 AI 대화 상대</p>
                         </div>
                     </div>
-                </div>
-
-                <!-- Description & Reward -->
-                <div>
-                    <label for="postDesc" class="block font-bold text-slate-700 mb-1">상세 설명 & 특징</label>
-                    <textarea id="postDesc" rows="3" placeholder="물건의 색상, 모양, 인형 키링 유무 등 자세히 적어주시면 찾기가 훨씬 쉬워져요!" class="w-full px-3.5 py-2.5 bg-slate-50 border-2 border-slate-100 rounded-2xl focus:outline-none focus:border-peach-400 transition resize-none"></textarea>
-                </div>
-
-                <!-- Submit Button -->
-                <div class="pt-2">
-                    <button type="submit" class="bounce-hover bounce-click w-full bg-gradient-to-r from-peach-400 to-peach-500 hover:from-peach-500 hover:to-peach-600 text-white font-bold py-3.5 rounded-2xl shadow-lg shadow-peach-200 transition flex items-center justify-center gap-2 text-sm">
-                        <span>🌸 게시글 소중하게 등록하기</span>
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Detail & Comments Modal -->
-    <div id="detailModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm hidden">
-        <div class="bg-white rounded-3xl max-w-2xl w-full max-h-[90vh] flex flex-col shadow-2xl border-4 border-peach-100 overflow-hidden">
-            
-            <!-- Modal Header -->
-            <div class="px-6 py-4 bg-slate-50 border-b-2 border-peach-100 flex justify-between items-center">
-                <span id="modalTypeBadge" class="px-3 py-1 rounded-full text-xs font-bold border">분실물</span>
-                <div class="flex items-center gap-2">
-                    <button id="toggleResolveBtn" class="bounce-click px-3 py-1.5 rounded-xl border-2 border-mint-300 bg-mint-50 text-xs font-bold text-mint-600 hover:bg-mint-100 transition flex items-center gap-1.5">
-                        <i data-lucide="check-circle-2" class="w-4 h-4"></i>
-                        <span id="resolveBtnText">찾음 완료하기!</span>
-                    </button>
-                    <button id="deletePostBtn" class="p-2 text-slate-400 hover:text-rose-500 rounded-xl hover:bg-rose-50 transition" title="게시글 삭제">
-                        <i data-lucide="trash-2" class="w-4 h-4"></i>
-                    </button>
-                    <button id="closeDetailBtn" class="p-2 text-slate-400 hover:text-slate-600 rounded-xl hover:bg-slate-100">
+                    <!-- Close sidebar button (Mobile) -->
+                    <button id="closeSidebarBtn" class="lg:hidden p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800">
                         <i data-lucide="x" class="w-5 h-5"></i>
                     </button>
                 </div>
-            </div>
 
-            <!-- Modal Content Area -->
-            <div class="p-6 overflow-y-auto space-y-6">
-                
-                <!-- Main Header Info -->
-                <div class="flex flex-col sm:flex-row gap-5">
-                    
-                    <!-- Image or Emoji Container -->
-                    <div id="modalImgContainer" class="w-full sm:w-1/2 aspect-square bg-peach-50 rounded-2xl border-2 border-peach-100 flex items-center justify-center overflow-hidden relative shadow-inner">
-                        <img id="modalImage" src="" alt="물품" class="w-full h-full object-cover hidden">
-                        <span id="modalEmoji" class="text-7xl animate-float">🧸</span>
+                <!-- New Conversation Button -->
+                <button id="newChatBtn" class="w-full bounce-hover bounce-click bg-gradient-to-r from-peach-400 to-peach-500 hover:from-peach-500 hover:to-peach-600 text-white font-bold py-3 px-4 rounded-2xl shadow-lg shadow-peach-200 dark:shadow-none flex items-center justify-center gap-2 text-xs border-2 border-white/40 mb-6">
+                    <i data-lucide="plus-circle" class="w-4 h-4"></i>
+                    <span>새 대화 시작하기</span>
+                </button>
+
+                <!-- AI Persona Selector List -->
+                <div class="flex-grow overflow-y-auto space-y-3 pr-1">
+                    <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 px-2 flex items-center gap-1">
+                        <span>✨ AI 캐릭터 페르소나</span>
                     </div>
 
-                    <!-- Details -->
-                    <div class="w-full sm:w-1/2 flex flex-col justify-between space-y-3">
+                    <div id="characterList" class="space-y-2">
+                        <!-- Characters dynamically rendered here -->
+                    </div>
+                </div>
+
+                <!-- Bottom Config & Actions -->
+                <div class="pt-4 mt-auto border-t border-peach-100 dark:border-slate-800/80 space-y-2">
+                    <!-- Theme Toggle -->
+                    <button id="themeToggleBtn" class="w-full flex items-center justify-between p-3 rounded-2xl bg-peach-50/60 dark:bg-slate-800/60 hover:bg-peach-100 dark:hover:bg-slate-800 text-xs font-bold text-slate-600 dark:text-slate-300 transition">
+                        <span class="flex items-center gap-2">
+                            <span id="themeIcon">🌙</span>
+                            <span id="themeText">다크 모드로 전환</span>
+                        </span>
+                        <span class="text-[10px] px-2 py-0.5 rounded-full bg-white dark:bg-slate-700 text-slate-400">모드</span>
+                    </button>
+
+                    <!-- User Name Customization -->
+                    <div class="p-3 rounded-2xl bg-peach-50/60 dark:bg-slate-800/60 flex items-center gap-2">
+                        <span class="text-lg">👤</span>
+                        <input type="text" id="userNameInput" value="몽글이친구" placeholder="내 이름 설정" class="w-full bg-transparent text-xs font-bold text-slate-700 dark:text-slate-200 focus:outline-none">
+                    </div>
+
+                    <!-- Clear Chat Button -->
+                    <button id="clearChatBtn" class="w-full flex items-center justify-center gap-1.5 p-2 text-xs text-rose-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30 rounded-xl transition font-medium">
+                        <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                        <span>현재 대화 내용 지우기</span>
+                    </button>
+                </div>
+            </div>
+        </aside>
+
+        <main class="flex-1 flex flex-col h-full min-w-0 bg-transparent">
+            
+            <!-- Chat Top Header Bar -->
+            <header class="h-16 border-b border-peach-100 dark:border-slate-800 bg-white/80 dark:bg-darkCard/80 backdrop-blur-md px-4 sm:px-6 flex items-center justify-between shrink-0 z-10">
+                <div class="flex items-center gap-3">
+                    <button id="openSidebarBtn" class="lg:hidden p-2 text-slate-500 hover:text-slate-700 dark:text-slate-300 rounded-xl bg-peach-50 dark:bg-slate-800">
+                        <i data-lucide="menu" class="w-5 h-5"></i>
+                    </button>
+
+                    <div class="flex items-center gap-2.5">
+                        <span id="activeCharAvatar" class="text-2xl animate-float">🐾</span>
                         <div>
-                            <span id="modalCategory" class="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold bg-lavender-100 text-lavender-500 mb-1">카테고리</span>
-                            <h2 id="modalTitle" class="text-xl font-bold text-slate-800 leading-snug">게시글 제목</h2>
-                            
-                            <div class="mt-4 space-y-2 text-xs sm:text-sm text-slate-600">
-                                <div class="flex items-center gap-2">
-                                    <span class="w-5 text-center">📍</span>
-                                    <span class="font-bold text-slate-400">장소:</span>
-                                    <span id="modalLocation" class="text-slate-700 font-semibold">강남역 인근</span>
-                                </div>
-                                <div class="flex items-center gap-2">
-                                    <span class="w-5 text-center">📅</span>
-                                    <span class="font-bold text-slate-400">날짜:</span>
-                                    <span id="modalDate" class="text-slate-700 font-semibold">2026-09-28</span>
-                                </div>
-                                <div class="flex items-center gap-2 bg-butter-100/70 p-3 rounded-2xl border border-butter-300">
-                                    <span class="w-5 text-center">💌</span>
-                                    <span class="font-bold text-amber-800">연락처:</span>
-                                    <span id="modalContact" class="font-bold text-amber-900">010-XXXX-XXXX</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="pt-2 text-[11px] text-slate-400 border-t border-slate-100 flex justify-between">
-                            <span>등록일: <span id="modalCreatedAt">2026.09.28</span></span>
+                            <h2 id="activeCharName" class="font-bold text-sm sm:text-base text-slate-800 dark:text-white flex items-center gap-1.5">
+                                친절한 몽글이
+                            </h2>
+                            <p id="activeCharDesc" class="text-[11px] text-slate-400 truncate max-w-[200px] sm:max-w-xs">무엇이든 친절하고 따뜻하게 들어주는 몽글이</p>
                         </div>
                     </div>
                 </div>
 
-                <!-- Detailed Text -->
-                <div class="bg-peach-50/60 p-4 rounded-2xl border border-peach-100">
-                    <h3 class="text-xs font-bold text-peach-500 uppercase tracking-wider mb-1.5 flex items-center gap-1">
-                        <span>📝</span> 상세 내용
-                    </h3>
-                    <p id="modalDescription" class="text-xs sm:text-sm text-slate-700 whitespace-pre-line leading-relaxed">
-                        상세 정보 설명입니다.
-                    </p>
+                <div class="flex items-center gap-2">
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-mint-50 dark:bg-mint-950/40 text-mint-600 dark:text-mint-400 border border-mint-200 dark:border-mint-800">
+                        <span class="w-2 h-2 rounded-full bg-mint-500 animate-pulse"></span>
+                        <span>Gemini AI 준비됨</span>
+                    </span>
                 </div>
+            </header>
 
-                <!-- Cute Comments Section -->
-                <div class="border-t border-slate-100 pt-5">
-                    <h3 class="text-sm font-bold text-slate-800 mb-3 flex items-center gap-1.5">
-                        <span>💬</span>
-                        <span>몽글 댓글 방 (<span id="commentCount">0</span>)</span>
-                    </h3>
-
-                    <!-- Comment List -->
-                    <div id="commentsList" class="space-y-2.5 max-h-48 overflow-y-auto pr-1 mb-4">
-                        <!-- Comments injected here -->
-                    </div>
-
-                    <!-- Add Comment Form -->
-                    <form id="commentForm" class="flex gap-2">
-                        <input type="text" id="commentAuthor" required placeholder="닉네임" class="w-24 px-3 py-2 bg-slate-50 border-2 border-slate-100 rounded-xl text-xs focus:outline-none focus:border-peach-400">
-                        <input type="text" id="commentInput" required placeholder="따뜻한 댓글을 남겨주세요..." class="flex-grow px-3.5 py-2 bg-slate-50 border-2 border-slate-100 rounded-xl text-xs focus:outline-none focus:border-peach-400">
-                        <button type="submit" class="bounce-hover bounce-click px-4 py-2 bg-peach-400 hover:bg-peach-500 text-white font-bold rounded-xl text-xs transition shrink-0 shadow-sm">
-                            등록 🐾
-                        </button>
-                    </form>
-                </div>
-
+            <div id="chatMessages" class="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4">
+                <!-- Messages will be dynamically rendered here -->
             </div>
-        </div>
+
+            <!-- Quick Suggestion Chips -->
+            <div class="px-4 sm:px-6 py-2 overflow-x-auto no-scrollbar flex items-center gap-2 border-t border-peach-100/50 dark:border-slate-800/50 bg-white/40 dark:bg-darkCard/30 backdrop-blur-sm" id="suggestionChips">
+                <!-- Dynamic Chips -->
+            </div>
+
+            <div class="p-3 sm:p-4 bg-white/80 dark:bg-darkCard/80 backdrop-blur-md border-t border-peach-100 dark:border-slate-800 shrink-0">
+                <form id="chatForm" class="max-w-4xl mx-auto flex items-center gap-2">
+                    <div class="relative flex-1 bg-peach-50/80 dark:bg-slate-800/80 rounded-2xl border-2 border-peach-100 dark:border-slate-700 focus-within:border-peach-400 dark:focus-within:border-peach-500 transition shadow-inner">
+                        <textarea 
+                            id="userInput" 
+                            rows="1" 
+                            placeholder="몽글이에게 마음을 전해보세요..." 
+                            class="w-full px-4 py-3 bg-transparent text-sm text-slate-800 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none resize-none max-h-32 leading-relaxed"
+                        ></textarea>
+                    </div>
+
+                    <button 
+                        type="submit" 
+                        id="sendBtn"
+                        class="bounce-hover bounce-click w-11 h-11 bg-gradient-to-r from-peach-400 to-peach-500 hover:from-peach-500 hover:to-peach-600 text-white rounded-2xl flex items-center justify-center shadow-lg shadow-peach-200 dark:shadow-none shrink-0 border-2 border-white/50 transition disabled:opacity-50"
+                    >
+                        <i data-lucide="send" class="w-5 h-5"></i>
+                    </button>
+                </form>
+                <div class="mt-1.5 text-center text-[10px] text-slate-400">
+                    몽글이는 실수할 수 있어요. 답변 내용을 필요 시 확인해주세요! 🌸
+                </div>
+            </div>
+
+        </main>
     </div>
 
-    <!-- Toast Notification Container -->
-    <div id="toastContainer" class="fixed bottom-6 right-6 z-50 flex flex-col gap-2 pointer-events-none"></div>
+    <script type="importmap">
+    {
+        "imports": {
+            "@google/genai": "https://esm.run/@google/genai"
+        }
+    }
+    </script>
 
-    <!-- Footer -->
-    <footer class="bg-white/60 border-t border-peach-100 py-4 text-center text-xs text-slate-400 mt-10">
-        <p>몽글몽글 분실물 센터 🌸 · 소중한 기억을 함께 찾아갑니다</p>
-    </footer>
+    <script type="module">
+        import { GoogleGenAI } from '@google/genai';
 
-    <script>
-        // Category Presets & Icons Map
-        const CATEGORY_MAP = {
-            '전자기기': { icon: '📱', color: 'bg-blue-50 text-blue-600 border-blue-200' },
-            '지갑/카드': { icon: '👛', color: 'bg-amber-50 text-amber-600 border-amber-200' },
-            '가방/의류': { icon: '🎒', color: 'bg-purple-50 text-purple-600 border-purple-200' },
-            '악세사리': { icon: '💍', color: 'bg-rose-50 text-rose-600 border-rose-200' },
-            '반려동물': { icon: '🐶', color: 'bg-emerald-50 text-emerald-600 border-emerald-200' },
-            '기타': { icon: '🧸', color: 'bg-slate-50 text-slate-600 border-slate-200' }
-        };
+        // AI Personas Definition
+        const CHARACTERS = [
+            {
+                id: 'monggle',
+                name: '친절한 몽글이',
+                avatar: '🐾',
+                tagline: 'Warm & Helpful',
+                description: '무엇이든 다정하고 포근하게 답변해주는 몽글이 마스코트예요.',
+                systemInstruction: '당신은 "몽글이"라는 이름의 귀엽고 다정한 AI 마스코트입니다. 항상 따뜻하고 다정하게 말하며, 문장 끝에 "몽글!", "🐾", "🌸" 같은 귀여운 표현이나 이모지를 적절히 사용하세요.',
+                suggestions: ['오늘 기분이 유난히 우울해 😭', '따뜻한 응원의 한마디 해줘!', '주말에 뭐하고 놀면 좋을까?']
+            },
+            {
+                id: 'counselor',
+                name: '따뜻한 상담사',
+                avatar: '🧸',
+                tagline: 'Empathetic Counselor',
+                description: '지친 마음을 따뜻하게 경청하고 감싸주는 공감 전문 상담사입니다.',
+                systemInstruction: '당신은 수용적이고 공감 능력 가득한 심리 상담사입니다. 사용자의 감정을 깊이 경청하고 비판 없이 다정하게 받아주세요.',
+                suggestions: ['요즘 일 때문에 스트레스를 너무 많이 받아', '마음이 불안할 때 가라앉히는 법 알려줘', '나 스스로가 자꾸 부족하게 느껴져']
+            },
+            {
+                id: 'summarizer',
+                name: '족집게 요약가',
+                avatar: '📑',
+                tagline: 'Summarizer Expert',
+                description: '긴 글이나 복잡한 내용을 명확하게 3줄로 핵심 요약해 드립니다.',
+                systemInstruction: '당신은 명쾌한 요약 전문가입니다. 사용자가 전달하는 글이나 주제를 불렛 포인트와 핵심 키워드로 깔끔하게 구조화하여 요약해 주세요.',
+                suggestions: ['인공지능의 역사에 대해 간단히 요약해줘', '업무 효율 올리는 핵심 팁 3가지', '블록체인의 기본 개념 정리해줘']
+            },
+            {
+                id: 'english_tutor',
+                name: '영어 회화 튜터',
+                avatar: '🇬🇧',
+                tagline: 'English Tutor',
+                description: '자연스러운 영어 표현을 친절히 교정해주고 회화를 함께 연습해요.',
+                systemInstruction: 'You are a friendly English conversation tutor. Respond in concise English, correct any mistakes gently, and explain key Korean meanings if helpful.',
+                suggestions: ['Let\'s practice order coffee in English!', 'How can I say "퇴근길이라 차가 막혀요" in natural English?', 'Recommend 3 good idioms for daily conversations.']
+            }
+        ];
 
-        // App State
-        let posts = [];
-        let activeStatusFilter = 'all';
-        let activeCategoryFilter = 'all';
-        let searchQuery = '';
-        let viewMode = 'grid'; // 'grid' | 'list'
-        let currentDetailPostId = null;
-        let selectedPresetEmoji = '🧸';
+        // State Management
+        let currentCharacter = CHARACTERS[0];
+        let chatHistory = []; // Array of { id, role, text, timestamp }
+        let isDarkMode = false;
+        let userName = '몽글이친구';
+        let isGenerating = false;
+
+        // Initialize Gemini API Client
+        // Note: process.env.GEMINI_API_KEY is handled seamlessly via SDK environment binding
+        const apiKey = typeof process !== 'undefined' && process.env && process.env.GEMINI_API_KEY ? process.env.GEMINI_API_KEY : '';
+        const ai = new GoogleGenAI({ apiKey: apiKey });
 
         // DOM Elements
-        const postsContainer = document.getElementById('postsContainer');
-        const emptyState = document.getElementById('emptyState');
-        const searchInput = document.getElementById('searchInput');
-        const gridViewBtn = document.getElementById('gridViewBtn');
-        const listViewBtn = document.getElementById('listViewBtn');
+        const characterList = document.getElementById('characterList');
+        const activeCharAvatar = document.getElementById('activeCharAvatar');
+        const activeCharName = document.getElementById('activeCharName');
+        const activeCharDesc = document.getElementById('activeCharDesc');
+        const chatMessages = document.getElementById('chatMessages');
+        const suggestionChips = document.getElementById('suggestionChips');
+        const chatForm = document.getElementById('chatForm');
+        const userInput = document.getElementById('userInput');
+        const userNameInput = document.getElementById('userNameInput');
+        const themeToggleBtn = document.getElementById('themeToggleBtn');
+        const themeIcon = document.getElementById('themeIcon');
+        const themeText = document.getElementById('themeText');
+        const clearChatBtn = document.getElementById('clearChatBtn');
+        const newChatBtn = document.getElementById('newChatBtn');
 
-        // Modals
-        const newPostModal = document.getElementById('newPostModal');
-        const openNewPostBtn = document.getElementById('openNewPostBtn');
-        const closeNewPostBtn = document.getElementById('closeNewPostBtn');
-        const postForm = document.getElementById('postForm');
+        // Sidebar elements
+        const sidebar = document.getElementById('sidebar');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+        const openSidebarBtn = document.getElementById('openSidebarBtn');
+        const closeSidebarBtn = document.getElementById('closeSidebarBtn');
 
-        const detailModal = document.getElementById('detailModal');
-        const closeDetailBtn = document.getElementById('closeDetailBtn');
-        const toggleResolveBtn = document.getElementById('toggleResolveBtn');
-        const resolveBtnText = document.getElementById('resolveBtnText');
-        const deletePostBtn = document.getElementById('deletePostBtn');
-        const commentForm = document.getElementById('commentForm');
-
-        // Initialization
         window.addEventListener('DOMContentLoaded', () => {
-            loadPostsFromStorage();
+            renderCharacterList();
             setupEventListeners();
-            renderPosts();
+            loadInitialChat();
             lucide.createIcons();
         });
 
-        // LocalStorage Management - Defaults to Empty Array []
-        function loadPostsFromStorage() {
-            const saved = localStorage.getItem('monggle_lost_found_posts');
-            if (saved) {
-                try {
-                    posts = JSON.parse(saved);
-                } catch (e) {
-                    posts = [];
-                }
-            } else {
-                posts = []; // Strictly zero items initially
-                savePostsToStorage();
-            }
-        }
-
-        function savePostsToStorage() {
-            localStorage.setItem('monggle_lost_found_posts', JSON.stringify(posts));
-        }
-
         function setupEventListeners() {
-            // Search Input Filter
-            searchInput.addEventListener('input', (e) => {
-                searchQuery = e.target.value.trim().toLowerCase();
-                renderPosts();
+            // Mobile Sidebar Toggles
+            openSidebarBtn.addEventListener('click', () => {
+                sidebar.classList.remove('-translate-x-full');
+                sidebarOverlay.classList.remove('hidden');
             });
 
-            // Status Tab Filtering
-            document.querySelectorAll('#statusFilterGroup button').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    document.querySelectorAll('#statusFilterGroup button').forEach(b => {
-                        b.classList.remove('bg-white', 'text-peach-500', 'shadow-sm');
-                    });
-                    btn.classList.add('bg-white', 'text-peach-500', 'shadow-sm');
+            closeSidebarBtn.addEventListener('click', closeSidebar);
+            sidebarOverlay.addEventListener('click', closeSidebar);
 
-                    activeStatusFilter = btn.dataset.status;
-                    renderPosts();
-                });
+            function closeSidebar() {
+                sidebar.classList.add('-translate-x-full');
+                sidebarOverlay.classList.add('hidden');
+            }
+
+            // Theme Toggle
+            themeToggleBtn.addEventListener('click', () => {
+                isDarkMode = !isDarkMode;
+                if (isDarkMode) {
+                    document.body.classList.remove('light-mode');
+                    document.body.classList.add('dark');
+                    themeIcon.innerText = '☀️';
+                    themeText.innerText = '라이트 모드로 전환';
+                } else {
+                    document.body.classList.remove('dark');
+                    document.body.classList.add('light-mode');
+                    themeIcon.innerText = '🌙';
+                    themeText.innerText = '다크 모드로 전환';
+                }
             });
 
-            // Category Filter Group
-            document.querySelectorAll('#categoryFilterGroup button').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    document.querySelectorAll('#categoryFilterGroup button').forEach(b => {
-                        b.className = 'cat-chip bounce-click px-4 py-2 rounded-2xl border-2 border-slate-100 bg-slate-50 text-slate-600 hover:bg-peach-50 font-bold whitespace-nowrap transition flex items-center gap-1.5';
-                    });
-                    btn.className = 'cat-chip bounce-click px-4 py-2 rounded-2xl border-2 border-peach-400 bg-peach-100 text-peach-600 font-bold whitespace-nowrap transition flex items-center gap-1.5 shadow-sm';
-
-                    activeCategoryFilter = btn.dataset.cat;
-                    renderPosts();
-                });
+            // User Name Change
+            userNameInput.addEventListener('change', (e) => {
+                userName = e.target.value.trim() || '몽글이친구';
             });
 
-            // View Mode Toggle
-            gridViewBtn.addEventListener('click', () => {
-                viewMode = 'grid';
-                gridViewBtn.className = 'p-2 rounded-xl text-peach-500 bg-white shadow-sm transition';
-                listViewBtn.className = 'p-2 rounded-xl text-slate-400 hover:text-slate-700 transition';
-                renderPosts();
+            // Clear Chat History
+            clearChatBtn.addEventListener('click', () => {
+                if (confirm('현재 대화 내용을 모두 지울까요? 🌸')) {
+                    chatHistory = [];
+                    renderMessages();
+                    addWelcomeMessage();
+                }
             });
 
-            listViewBtn.addEventListener('click', () => {
-                viewMode = 'list';
-                listViewBtn.className = 'p-2 rounded-xl text-peach-500 bg-white shadow-sm transition';
-                gridViewBtn.className = 'p-2 rounded-xl text-slate-400 hover:text-slate-700 transition';
-                renderPosts();
+            newChatBtn.addEventListener('click', () => {
+                chatHistory = [];
+                renderMessages();
+                addWelcomeMessage();
+                closeSidebar();
             });
 
-            // Preset Emoji Selector inside New Post Form
-            document.querySelectorAll('#presetIconPicker .preset-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    selectedPresetEmoji = btn.dataset.preset;
-                    showToast(`${selectedPresetEmoji} 이모지가 아이콘으로 선택되었어요!`);
-                });
+            // Textarea auto-resize
+            userInput.addEventListener('input', () => {
+                userInput.style.height = 'auto';
+                userInput.style.height = Math.min(userInput.scrollHeight, 120) + 'px';
             });
 
-            // Modal Controls
-            openNewPostBtn.addEventListener('click', () => {
-                document.getElementById('postDate').value = new Date().toISOString().split('T')[0];
-                newPostModal.classList.remove('hidden');
-            });
-
-            closeNewPostBtn.addEventListener('click', () => newPostModal.classList.add('hidden'));
-
-            // Submit New Item
-            postForm.addEventListener('submit', (e) => {
+            // Submit Chat Form
+            chatForm.addEventListener('submit', (e) => {
                 e.preventDefault();
-                const formData = new FormData(postForm);
-                const category = document.getElementById('postCategory').value;
-                const imageUrl = document.getElementById('postImageUrl').value.trim();
-
-                const newPost = {
-                    id: 'monggle-' + Date.now(),
-                    type: formData.get('type'), // 'lost' | 'found'
-                    status: 'active', // 'active' | 'resolved'
-                    title: document.getElementById('postTitle').value.trim(),
-                    category: category,
-                    date: document.getElementById('postDate').value,
-                    location: document.getElementById('postLocation').value.trim(),
-                    contact: document.getElementById('postContact').value.trim(),
-                    imageUrl: imageUrl || '',
-                    presetEmoji: selectedPresetEmoji || (CATEGORY_MAP[category]?.icon || '🧸'),
-                    description: document.getElementById('postDesc').value.trim() || '상세 설명이 적혀있지 않아요.',
-                    createdAt: new Date().toLocaleDateString('ko-KR'),
-                    comments: []
-                };
-
-                posts.unshift(newPost);
-                savePostsToStorage();
-                renderPosts();
-
-                postForm.reset();
-                newPostModal.classList.add('hidden');
-                showToast('🌸 게시글이 몽글몽글하게 등록되었습니다!');
+                handleSendMessage();
             });
 
-            // Detail Modal Handlers
-            closeDetailBtn.addEventListener('click', () => detailModal.classList.add('hidden'));
-
-            // Toggle "Found/Completed" Status
-            toggleResolveBtn.addEventListener('click', () => {
-                if (!currentDetailPostId) return;
-                const post = posts.find(p => p.id === currentDetailPostId);
-                if (post) {
-                    post.status = post.status === 'resolved' ? 'active' : 'resolved';
-                    savePostsToStorage();
-                    renderPosts();
-                    openDetailModal(post.id);
-                    showToast(post.status === 'resolved' ? '🎉 주인을 찾아 완결 처리되었습니다!' : '상태가 다시 진행중으로 변경되었어요.');
+            // Enter key to send (Shift+Enter for newline)
+            userInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    handleSendMessage();
                 }
-            });
-
-            // Delete Item
-            deletePostBtn.addEventListener('click', () => {
-                if (!currentDetailPostId) return;
-                if (confirm('이 게시글을 정말 삭제할까요? 🌸')) {
-                    posts = posts.filter(p => p.id !== currentDetailPostId);
-                    savePostsToStorage();
-                    renderPosts();
-                    detailModal.classList.add('hidden');
-                    showToast('게시글이 삭제되었습니다.');
-                }
-            });
-
-            // Comment Submission
-            commentForm.addEventListener('submit', (e) => {
-                e.preventDefault();
-                if (!currentDetailPostId) return;
-
-                const author = document.getElementById('commentAuthor').value.trim();
-                const text = document.getElementById('commentInput').value.trim();
-
-                const post = posts.find(p => p.id === currentDetailPostId);
-                if (post) {
-                    if (!post.comments) post.comments = [];
-                    post.comments.push({
-                        id: 'c-' + Date.now(),
-                        author: author,
-                        text: text,
-                        createdAt: new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })
-                    });
-
-                    savePostsToStorage();
-                    renderDetailComments(post.comments);
-                    renderPosts();
-
-                    document.getElementById('commentInput').value = '';
-                    showToast('댓글이 작성되었습니다 🐾');
-                }
-            });
-
-            // Outside Modal Click
-            window.addEventListener('click', (e) => {
-                if (e.target === newPostModal) newPostModal.classList.add('hidden');
-                if (e.target === detailModal) detailModal.classList.add('hidden');
             });
         }
 
-        function renderPosts() {
-            // Filtering Logic
-            const filtered = posts.filter(post => {
-                if (activeStatusFilter === 'lost' && (post.type !== 'lost' || post.status === 'resolved')) return false;
-                if (activeStatusFilter === 'found' && (post.type !== 'found' || post.status === 'resolved')) return false;
-                if (activeStatusFilter === 'resolved' && post.status !== 'resolved') return false;
-
-                if (activeCategoryFilter !== 'all' && post.category !== activeCategoryFilter) return false;
-
-                if (searchQuery) {
-                    const matchTitle = post.title.toLowerCase().includes(searchQuery);
-                    const matchLoc = post.location.toLowerCase().includes(searchQuery);
-                    const matchDesc = post.description.toLowerCase().includes(searchQuery);
-                    const matchCat = post.category.toLowerCase().includes(searchQuery);
-                    if (!matchTitle && !matchLoc && !matchDesc && !matchCat) return false;
-                }
-
-                return true;
-            });
-
-            // Empty State Display
-            if (filtered.length === 0) {
-                postsContainer.innerHTML = '';
-                emptyState.classList.remove('hidden');
-                return;
-            } else {
-                emptyState.classList.add('hidden');
-            }
-
-            // Grid vs List Layout dynamic classes
-            if (viewMode === 'grid') {
-                postsContainer.className = 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5';
-            } else {
-                postsContainer.className = 'flex flex-col gap-3.5';
-            }
-
-            postsContainer.innerHTML = filtered.map(post => {
-                const isResolved = post.status === 'resolved';
-                const isLost = post.type === 'lost';
-                const catMeta = CATEGORY_MAP[post.category] || CATEGORY_MAP['기타'];
-
-                // Badge Tag
-                let badgeHTML = '';
-                if (isResolved) {
-                    badgeHTML = `<span class="bg-mint-100 text-mint-600 border border-mint-300 text-[11px] px-2.5 py-1 rounded-full font-bold flex items-center gap-1">🎉 찾기완료</span>`;
-                } else if (isLost) {
-                    badgeHTML = `<span class="bg-peach-100 text-peach-500 border border-peach-200 text-[11px] px-2.5 py-1 rounded-full font-bold flex items-center gap-1">😭 분실해요</span>`;
-                } else {
-                    badgeHTML = `<span class="bg-butter-100 text-amber-700 border border-butter-300 text-[11px] px-2.5 py-1 rounded-full font-bold flex items-center gap-1">🎁 습득했어요</span>`;
-                }
-
-                if (viewMode === 'grid') {
-                    return `
-                        <div onclick="openDetailModal('${post.id}')" class="bounce-hover bounce-click group bg-white rounded-3xl border-2 border-peach-100/80 overflow-hidden shadow-sm hover:border-peach-300 hover:shadow-md transition cursor-pointer flex flex-col justify-between ${isResolved ? 'opacity-70 bg-slate-50/50' : ''}">
-                            <div>
-                                <!-- Image or Emoji Header -->
-                                <div class="relative w-full aspect-[4/3] bg-peach-50/60 overflow-hidden flex items-center justify-center border-b border-peach-100">
-                                    ${post.imageUrl 
-                                        ? `<img src="${post.imageUrl}" alt="${post.title}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" onerror="this.style.display='none'; this.nextElementSibling.classList.remove('hidden');">`
-                                        : ''
-                                    }
-                                    <span class="text-6xl ${post.imageUrl ? 'hidden' : ''} group-hover:scale-110 transition duration-300">${post.presetEmoji || catMeta.icon}</span>
-                                    
-                                    <div class="absolute top-3 left-3">
-                                        ${badgeHTML}
-                                    </div>
-                                </div>
-                                
-                                <!-- Card Main Content -->
-                                <div class="p-4 space-y-2">
-                                    <div class="flex items-center justify-between">
-                                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${catMeta.color} border">
-                                            ${catMeta.icon} ${post.category}
-                                        </span>
-                                        <span class="text-[10px] text-slate-400 font-num">${post.date}</span>
-                                    </div>
-                                    <h3 class="font-bold text-slate-800 text-sm line-clamp-1 group-hover:text-peach-500 transition">${escapeHtml(post.title)}</h3>
-                                    <p class="text-xs text-slate-500 line-clamp-2 leading-relaxed">${escapeHtml(post.description)}</p>
-                                </div>
+        function renderCharacterList() {
+            characterList.innerHTML = CHARACTERS.map(char => {
+                const isActive = char.id === currentCharacter.id;
+                return `
+                    <button 
+                        onclick="switchCharacter('${char.id}')"
+                        class="w-full text-left p-3 rounded-2xl border-2 transition flex items-center gap-3 ${
+                            isActive 
+                            ? 'bg-peach-100/80 dark:bg-peach-900/40 border-peach-400 dark:border-peach-500 text-slate-800 dark:text-white shadow-sm' 
+                            : 'bg-white/50 dark:bg-slate-800/30 border-peach-100/60 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:bg-peach-50 dark:hover:bg-slate-800'
+                        }"
+                    >
+                        <span class="text-2xl shrink-0">${char.avatar}</span>
+                        <div class="min-w-0 flex-1">
+                            <div class="flex items-center justify-between">
+                                <h3 class="font-bold text-xs sm:text-sm truncate">${char.name}</h3>
+                                <span class="text-[10px] px-1.5 py-0.5 rounded-full bg-peach-50 dark:bg-slate-700 text-peach-500 dark:text-peach-300">${char.tagline}</span>
                             </div>
-
-                            <!-- Card Footer -->
-                            <div class="px-4 py-3 bg-peach-50/30 border-t border-peach-100/60 flex items-center justify-between text-xs text-slate-400">
-                                <div class="flex items-center gap-1 truncate max-w-[70%]">
-                                    <span>📍</span>
-                                    <span class="truncate font-medium text-slate-600">${escapeHtml(post.location)}</span>
-                                </div>
-                                <span class="flex items-center gap-1 text-[11px] font-bold text-peach-400">
-                                    💬 ${post.comments ? post.comments.length : 0}
-                                </span>
-                            </div>
+                            <p class="text-[11px] opacity-75 truncate mt-0.5">${char.description}</p>
                         </div>
-                    `;
-                } else {
-                    // List View Item
-                    return `
-                        <div onclick="openDetailModal('${post.id}')" class="bounce-hover bounce-click group bg-white rounded-3xl border-2 border-peach-100/80 p-3.5 shadow-sm hover:border-peach-300 transition cursor-pointer flex items-center gap-4 ${isResolved ? 'opacity-70' : ''}">
-                            <!-- Thumbnail / Emoji -->
-                            <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-peach-50 border border-peach-100 flex items-center justify-center shrink-0 overflow-hidden relative">
-                                ${post.imageUrl 
-                                    ? `<img src="${post.imageUrl}" alt="${post.title}" class="w-full h-full object-cover" onerror="this.style.display='none'; this.nextElementSibling.classList.remove('hidden');">`
-                                    : ''
-                                }
-                                <span class="text-3xl ${post.imageUrl ? 'hidden' : ''}">${post.presetEmoji || catMeta.icon}</span>
-                            </div>
-
-                            <!-- List Details -->
-                            <div class="flex-grow min-w-0 space-y-1">
-                                <div class="flex items-center gap-2 flex-wrap">
-                                    ${badgeHTML}
-                                    <span class="text-[11px] font-bold px-2 py-0.5 rounded-full ${catMeta.color} border">${post.category}</span>
-                                </div>
-                                <h3 class="font-bold text-slate-800 text-sm sm:text-base truncate group-hover:text-peach-500 transition">${escapeHtml(post.title)}</h3>
-                                <div class="flex flex-wrap items-center gap-x-4 text-xs text-slate-400">
-                                    <span>📍 ${escapeHtml(post.location)}</span>
-                                    <span>📅 ${post.date}</span>
-                                </div>
-                            </div>
-
-                            <!-- Arrow -->
-                            <div class="pr-2 text-slate-300 group-hover:text-peach-400 transition">
-                                <i data-lucide="chevron-right" class="w-5 h-5"></i>
-                            </div>
-                        </div>
-                    `;
-                }
+                    </button>
+                `;
             }).join('');
-
-            lucide.createIcons();
         }
 
-        function openDetailModal(postId) {
-            const post = posts.find(p => p.id === postId);
-            if (!post) return;
+        window.switchCharacter = function(charId) {
+            const selected = CHARACTERS.find(c => c.id === charId);
+            if (!selected) return;
 
-            currentDetailPostId = postId;
+            currentCharacter = selected;
+            renderCharacterList();
+            updateHeaderAndSuggestions();
+            chatHistory = [];
+            renderMessages();
+            addWelcomeMessage();
 
-            const isResolved = post.status === 'resolved';
-            const isLost = post.type === 'lost';
-            const catMeta = CATEGORY_MAP[post.category] || CATEGORY_MAP['기타'];
+            // Close sidebar on mobile after selecting
+            sidebar.classList.add('-translate-x-full');
+            sidebarOverlay.classList.add('hidden');
+        };
 
-            // Status Badge Setup
-            const modalTypeBadge = document.getElementById('modalTypeBadge');
-            if (isResolved) {
-                modalTypeBadge.className = 'px-3 py-1 rounded-full text-xs font-bold bg-mint-100 text-mint-600 border border-mint-300';
-                modalTypeBadge.innerText = '🎉 찾기 완료됨';
-            } else if (isLost) {
-                modalTypeBadge.className = 'px-3 py-1 rounded-full text-xs font-bold bg-peach-100 text-peach-600 border border-peach-200';
-                modalTypeBadge.innerText = '😭 분실물 게시글';
-            } else {
-                modalTypeBadge.className = 'px-3 py-1 rounded-full text-xs font-bold bg-butter-100 text-amber-800 border border-butter-300';
-                modalTypeBadge.innerText = '🎁 습득물 게시글';
-            }
+        function updateHeaderAndSuggestions() {
+            activeCharAvatar.innerText = currentCharacter.avatar;
+            activeCharName.innerText = currentCharacter.name;
+            activeCharDesc.innerText = currentCharacter.description;
 
-            // Resolve Button text state
-            resolveBtnText.innerText = isResolved ? '다시 찾기 중으로 변경' : '찾음 완료하기!';
-
-            document.getElementById('modalTitle').innerText = post.title;
-            document.getElementById('modalCategory').innerText = `${catMeta.icon} ${post.category}`;
-            document.getElementById('modalCategory').className = `inline-block px-2.5 py-0.5 rounded-full text-xs font-bold ${catMeta.color} border mb-1`;
-            document.getElementById('modalLocation').innerText = post.location;
-            document.getElementById('modalDate').innerText = post.date;
-            document.getElementById('modalContact').innerText = post.contact;
-            document.getElementById('modalDescription').innerText = post.description;
-            document.getElementById('modalCreatedAt').innerText = post.createdAt;
-
-            // Handle Image or Emoji Illustration
-            const imgEl = document.getElementById('modalImage');
-            const emojiEl = document.getElementById('modalEmoji');
-
-            if (post.imageUrl) {
-                imgEl.src = post.imageUrl;
-                imgEl.classList.remove('hidden');
-                emojiEl.classList.add('hidden');
-            } else {
-                imgEl.classList.add('hidden');
-                emojiEl.innerText = post.presetEmoji || catMeta.icon;
-                emojiEl.classList.remove('hidden');
-            }
-
-            // Render Comments list
-            renderDetailComments(post.comments || []);
-
-            detailModal.classList.remove('hidden');
-            lucide.createIcons();
-        }
-
-        function renderDetailComments(comments) {
-            const commentsList = document.getElementById('commentsList');
-            document.getElementById('commentCount').innerText = comments.length;
-
-            if (comments.length === 0) {
-                commentsList.innerHTML = `<div class="text-center py-4 bg-slate-50 rounded-2xl border border-dashed border-slate-200 text-xs text-slate-400">아직 댓글이 없어요. 따뜻한 제보나 문의글을 남겨보세요! 🌸</div>`;
-                return;
-            }
-
-            commentsList.innerHTML = comments.map(c => `
-                <div class="bg-peach-50/50 p-3 rounded-2xl border border-peach-100 text-xs space-y-1">
-                    <div class="flex justify-between items-center">
-                        <span class="font-bold text-slate-800 flex items-center gap-1">
-                            <span>🐾</span> ${escapeHtml(c.author)}
-                        </span>
-                        <span class="text-[10px] text-slate-400 font-num">${c.createdAt}</span>
-                    </div>
-                    <p class="text-slate-600 leading-relaxed pl-5">${escapeHtml(c.text)}</p>
-                </div>
+            // Render Suggestion Chips
+            suggestionChips.innerHTML = currentCharacter.suggestions.map(sug => `
+                <button 
+                    onclick="sendPresetQuery('${sug.replace(/'/g, "\\'")}')" 
+                    class="bounce-hover bounce-click text-xs font-semibold px-3 py-1.5 rounded-full bg-white dark:bg-darkCard border border-peach-200 dark:border-slate-700 text-peach-600 dark:text-peach-300 hover:bg-peach-50 dark:hover:bg-slate-800 transition shrink-0 flex items-center gap-1 shadow-sm"
+                >
+                    <span>💡</span>
+                    <span>${sug}</span>
+                </button>
             `).join('');
         }
 
-        // Cute Toast Notification Helper
-        function showToast(message) {
-            const toastContainer = document.getElementById('toastContainer');
-            const toast = document.createElement('div');
-            toast.className = 'bg-slate-800/90 backdrop-blur-md text-white text-xs font-bold px-4 py-3 rounded-2xl shadow-xl border border-slate-700/50 flex items-center gap-2 transform transition-all duration-300 translate-y-4 opacity-0 pointer-events-auto';
-            toast.innerHTML = `
-                <span>🌸</span>
-                <span>${escapeHtml(message)}</span>
-            `;
-            
-            toastContainer.appendChild(toast);
+        window.sendPresetQuery = function(text) {
+            userInput.value = text;
+            handleSendMessage();
+        };
 
-            setTimeout(() => {
-                toast.classList.remove('translate-y-4', 'opacity-0');
-            }, 10);
-
-            setTimeout(() => {
-                toast.classList.add('opacity-0', 'translate-y-2');
-                setTimeout(() => toast.remove(), 300);
-            }, 3200);
+        function loadInitialChat() {
+            updateHeaderAndSuggestions();
+            addWelcomeMessage();
         }
 
-        // XSS Prevention Utility
-        function escapeHtml(str) {
-            if (!str) return '';
-            return str.replace(/&/g, "&amp;")
-                      .replace(/</g, "&lt;")
-                      .replace(/>/g, "&gt;")
-                      .replace(/"/g, "&quot;")
-                      .replace(/'/g, "&#039;");
+        function addWelcomeMessage() {
+            const welcomeText = `안녕하세요! **${currentCharacter.name}**입니다. 🌸\n오늘 어떤 도움이 필요하신가요? 편하게 말해주세요!`;
+            chatHistory.push({
+                id: 'msg-' + Date.now(),
+                role: 'model',
+                text: welcomeText,
+                timestamp: getCurrentTime()
+            });
+            renderMessages();
+        }
+
+        async function handleSendMessage() {
+            const text = userInput.value.trim();
+            if (!text || isGenerating) return;
+
+            // Add user message
+            const userMsg = {
+                id: 'msg-' + Date.now(),
+                role: 'user',
+                text: text,
+                timestamp: getCurrentTime()
+            };
+            chatHistory.push(userMsg);
+
+            userInput.value = '';
+            userInput.style.height = 'auto';
+            renderMessages();
+
+            // Show Typing Indicator
+            isGenerating = true;
+            showTypingIndicator();
+
+            try {
+                // Prepare API Payload with Google GenAI SDK
+                // Construct turn history for multi-turn conversational context
+                const contents = chatHistory.map(m => ({
+                    role: m.role === 'user' ? 'user' : 'model',
+                    parts: [{ text: m.text }]
+                }));
+
+                const response = await ai.models.generateContent({
+                    model: 'gemini-3-flash-preview',
+                    contents: contents,
+                    config: {
+                        systemInstruction: currentCharacter.systemInstruction,
+                        temperature: 0.7
+                    }
+                });
+
+                removeTypingIndicator();
+
+                const aiText = response.text || '죄송해요, 잠시 생각을 정돈하지 못했어요 몽글... 다시 말씀해주실 수 있나요? 🐾';
+                
+                chatHistory.push({
+                    id: 'msg-' + Date.now(),
+                    role: 'model',
+                    text: aiText,
+                    timestamp: getCurrentTime()
+                });
+
+            } catch (err) {
+                console.error('Gemini API Error:', err);
+                removeTypingIndicator();
+                chatHistory.push({
+                    id: 'msg-' + Date.now(),
+                    role: 'model',
+                    text: '⚠️ 몽글이와의 연결이 잠시 불안정해요. 잠시 후 다시 시도해보세요!',
+                    timestamp: getCurrentTime()
+                });
+            } finally {
+                isGenerating = false;
+                renderMessages();
+            }
+        }
+
+        function renderMessages() {
+            chatMessages.innerHTML = chatHistory.map(msg => {
+                const isUser = msg.role === 'user';
+                const formattedContent = marked.parse(msg.text);
+
+                return `
+                    <div class="flex gap-3 ${isUser ? 'flex-row-reverse' : 'flex-row'} items-start group">
+                        <!-- Avatar -->
+                        <div class="w-9 h-9 rounded-2xl ${isUser ? 'bg-butter-100 text-amber-700 border-2 border-butter-300' : 'bg-peach-100 dark:bg-peach-900/40 text-peach-500 border-2 border-peach-200 dark:border-peach-700'} flex items-center justify-center text-lg shrink-0 shadow-inner">
+                            ${isUser ? '👤' : currentCharacter.avatar}
+                        </div>
+
+                        <!-- Bubble -->
+                        <div class="max-w-[82%] sm:max-w-[75%] space-y-1">
+                            <div class="flex items-center gap-2 ${isUser ? 'justify-end' : 'justify-start'} text-[10px] text-slate-400 px-1">
+                                <span class="font-bold text-slate-600 dark:text-slate-300">${isUser ? userName : currentCharacter.name}</span>
+                                <span>${msg.timestamp}</span>
+                            </div>
+
+                            <div class="p-3.5 sm:p-4 rounded-3xl ${
+                                isUser 
+                                ? 'bg-gradient-to-r from-peach-400 to-peach-500 text-white rounded-tr-sm shadow-md' 
+                                : 'bg-white dark:bg-darkCard border-2 border-peach-100/80 dark:border-slate-800 text-slate-700 dark:text-slate-200 rounded-tl-sm shadow-sm'
+                            } text-xs sm:text-sm leading-relaxed chat-content relative">
+                                ${formattedContent}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            // Code Block Copy Button Helper
+            setupCodeCopyButtons();
+            scrollToBottom();
+        }
+
+        function showTypingIndicator() {
+            const typingHTML = `
+                <div id="typingIndicator" class="flex gap-3 flex-row items-start">
+                    <div class="w-9 h-9 rounded-2xl bg-peach-100 dark:bg-peach-900/40 text-peach-500 border-2 border-peach-200 flex items-center justify-center text-lg shrink-0">
+                        ${currentCharacter.avatar}
+                    </div>
+                    <div class="p-3.5 bg-white dark:bg-darkCard border-2 border-peach-100 dark:border-slate-800 rounded-3xl rounded-tl-sm shadow-sm flex items-center gap-1.5">
+                        <span class="w-2 h-2 rounded-full bg-peach-400 typing-dot"></span>
+                        <span class="w-2 h-2 rounded-full bg-peach-400 typing-dot"></span>
+                        <span class="w-2 h-2 rounded-full bg-peach-400 typing-dot"></span>
+                    </div>
+                </div>
+            `;
+            chatMessages.insertAdjacentHTML('beforeend', typingHTML);
+            scrollToBottom();
+        }
+
+        function removeTypingIndicator() {
+            const el = document.getElementById('typingIndicator');
+            if (el) el.remove();
+        }
+
+        function scrollToBottom() {
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function setupCodeCopyButtons() {
+            const pres = chatMessages.querySelectorAll('pre');
+            pres.forEach(pre => {
+                if (pre.querySelector('.copy-btn')) return;
+
+                const btn = document.createElement('button');
+                btn.className = 'copy-btn absolute top-2 right-2 px-2 py-1 text-[10px] font-bold bg-slate-700 text-slate-200 rounded-md hover:bg-slate-600 transition opacity-80 hover:opacity-100';
+                btn.innerText = '복사 📋';
+                btn.onclick = () => {
+                    const code = pre.querySelector('code')?.innerText || pre.innerText;
+                    navigator.clipboard.writeText(code);
+                    btn.innerText = '완료! ✨';
+                    setTimeout(() => btn.innerText = '복사 📋', 2000);
+                };
+                pre.style.position = 'relative';
+                pre.appendChild(btn);
+            });
+        }
+
+        function getCurrentTime() {
+            const now = new Date();
+            return now.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' });
         }
     </script>
 </body>
