@@ -1,1 +1,825 @@
-안녕 나는 주은이야
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>분실물 센터 / 통합 게시판</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Pretendard', sans-serif;
+            background-color: #f8fafc;
+        }
+        /* Custom scrollbar for comments and clean look */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="text-slate-800 min-h-screen flex flex-col">
+
+    <!-- Header -->
+    <header class="sticky top-0 z-30 bg-white/90 backdrop-blur-md border-b border-slate-200 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16 gap-4">
+                <!-- Logo -->
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center text-white font-bold text-xl shadow-md shadow-indigo-200">
+                        <i data-lucide="search-check" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-lg font-bold leading-tight text-slate-900">스마트 분실물 센터</h1>
+                        <p class="text-xs text-slate-500 hidden sm:block">소중한 물건을 빠르게 찾아드립니다</p>
+                    </div>
+                </div>
+
+                <!-- Right Action Buttons -->
+                <div class="flex items-center gap-3">
+                    <button id="openNewPostBtn" class="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white font-medium px-4 py-2.5 rounded-xl transition shadow-md shadow-indigo-100 text-sm">
+                        <i data-lucide="plus-circle" class="w-4 h-4"></i>
+                        <span>글작성하기</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        
+        <!-- Search & Control Panel -->
+        <section class="bg-white rounded-2xl p-4 sm:p-5 shadow-sm border border-slate-200/80 mb-6 space-y-4">
+            <!-- Search Bar & View Mode Toggle -->
+            <div class="flex flex-col md:flex-row gap-3 items-center justify-between">
+                <div class="relative w-full md:w-96">
+                    <i data-lucide="search" class="w-5 h-5 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                    <input type="text" id="searchInput" placeholder="품목명, 위치, 글제목 검색..." class="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition">
+                </div>
+                
+                <div class="flex items-center justify-between w-full md:w-auto gap-3">
+                    <!-- Status Filter Tabs -->
+                    <div class="inline-flex p-1 bg-slate-100 rounded-xl text-xs font-medium text-slate-600" id="statusFilterGroup">
+                        <button data-status="all" class="status-tab px-3 py-1.5 rounded-lg transition bg-white text-indigo-600 shadow-sm font-semibold">전체</button>
+                        <button data-status="lost" class="status-tab px-3 py-1.5 rounded-lg transition hover:text-slate-900">분실해요</button>
+                        <button data-status="found" class="status-tab px-3 py-1.5 rounded-lg transition hover:text-slate-900">습득했어요</button>
+                        <button data-status="resolved" class="status-tab px-3 py-1.5 rounded-lg transition hover:text-slate-900">찾음완료</button>
+                    </div>
+
+                    <!-- View Switcher -->
+                    <div class="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200/50">
+                        <button id="gridViewBtn" class="p-1.5 rounded-lg text-indigo-600 bg-white shadow-sm transition" title="그리드 뷰">
+                            <i data-lucide="layout-grid" class="w-4 h-4"></i>
+                        </button>
+                        <button id="listViewBtn" class="p-1.5 rounded-lg text-slate-500 hover:text-slate-900 transition" title="리스트 뷰">
+                            <i data-lucide="list" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Category Filter Horizontal Scroll -->
+            <div class="pt-2 border-t border-slate-100">
+                <div class="flex items-center gap-2 overflow-x-auto pb-1 text-sm no-scrollbar" id="categoryFilterGroup">
+                    <button data-cat="all" class="cat-chip flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border border-indigo-600 bg-indigo-50 text-indigo-700 font-medium whitespace-nowrap text-xs transition">
+                        <i data-lucide="grid" class="w-3.5 h-3.5"></i> 전체 카테고리
+                    </button>
+                    <button data-cat="전자기기" class="cat-chip flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 font-medium whitespace-nowrap text-xs transition">
+                        <i data-lucide="smartphone" class="w-3.5 h-3.5"></i> 전자기기
+                    </button>
+                    <button data-cat="지갑/신용카드" class="cat-chip flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 font-medium whitespace-nowrap text-xs transition">
+                        <i data-lucide="wallet" class="w-3.5 h-3.5"></i> 지갑/신용카드
+                    </button>
+                    <button data-cat="가방/의류" class="cat-chip flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 font-medium whitespace-nowrap text-xs transition">
+                        <i data-lucide="shopping-bag" class="w-3.5 h-3.5"></i> 가방/의류
+                    </button>
+                    <button data-cat="액세서리" class="cat-chip flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 font-medium whitespace-nowrap text-xs transition">
+                        <i data-lucide="watch" class="w-3.5 h-3.5"></i> 액세서리
+                    </button>
+                    <button data-cat="기타" class="cat-chip flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 font-medium whitespace-nowrap text-xs transition">
+                        <i data-lucide="more-horizontal" class="w-3.5 h-3.5"></i> 기타
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Post List Container -->
+        <section id="postsContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+            <!-- Dynamic Post Cards loaded via JS -->
+        </section>
+
+        <!-- Empty State -->
+        <div id="emptyState" class="hidden text-center py-16 bg-white rounded-2xl border border-slate-200 shadow-sm mt-4">
+            <div class="w-16 h-16 bg-slate-100 text-slate-400 rounded-full flex items-center justify-center mx-auto mb-3">
+                <i data-lucide="inbox" class="w-8 h-8"></i>
+            </div>
+            <h3 class="text-base font-semibold text-slate-800">등록된 게시물이 없습니다</h3>
+            <p class="text-xs text-slate-500 mt-1">검색어를 변경하거나 새로운 분실/습득물을 등록해 보세요.</p>
+        </div>
+    </main>
+
+    <!-- New Post Modal -->
+    <div id="newPostModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm hidden">
+        <div class="bg-white rounded-2xl max-w-lg w-full max-h-[90vh] flex flex-col shadow-2xl border border-slate-100 overflow-hidden transform transition-all">
+            <!-- Modal Header -->
+            <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+                <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+                    <i data-lucide="file-plus-2" class="w-5 h-5 text-indigo-600"></i>
+                    게시글 작성하기
+                </h2>
+                <button id="closeNewPostBtn" class="text-slate-400 hover:text-slate-600 p-1 rounded-lg hover:bg-slate-100">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <!-- Form Body -->
+            <form id="postForm" class="p-6 overflow-y-auto space-y-4 text-sm">
+                <!-- Status Type -->
+                <div>
+                    <label class="block font-medium text-slate-700 mb-1.5">구분 <span class="text-rose-500">*</span></label>
+                    <div class="grid grid-cols-2 gap-3">
+                        <label class="border border-slate-200 rounded-xl p-3 flex items-center justify-center gap-2 cursor-pointer hover:bg-slate-50 has-[:checked]:border-rose-500 has-[:checked]:bg-rose-50/50 has-[:checked]:text-rose-600 font-medium text-slate-600 transition">
+                            <input type="radio" name="type" value="lost" checked class="hidden">
+                            <i data-lucide="help-circle" class="w-4 h-4"></i>
+                            <span>분실했어요 (잃어버림)</span>
+                        </label>
+                        <label class="border border-slate-200 rounded-xl p-3 flex items-center justify-center gap-2 cursor-pointer hover:bg-slate-50 has-[:checked]:border-blue-500 has-[:checked]:bg-blue-50/50 has-[:checked]:text-blue-600 font-medium text-slate-600 transition">
+                            <input type="radio" name="type" value="found" class="hidden">
+                            <i data-lucide="check-circle-2" class="w-4 h-4"></i>
+                            <span>습득했어요 (주웠음)</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Title -->
+                <div>
+                    <label for="postTitle" class="block font-medium text-slate-700 mb-1">제목 <span class="text-rose-500">*</span></label>
+                    <input type="text" id="postTitle" required placeholder="예: 강남역 인근에서 에어팟 프로 2세대 습득" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500">
+                </div>
+
+                <!-- Category & Date Grid -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label for="postCategory" class="block font-medium text-slate-700 mb-1">카테고리 <span class="text-rose-500">*</span></label>
+                        <select id="postCategory" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500">
+                            <option value="전자기기">전자기기</option>
+                            <option value="지갑/신용카드">지갑/신용카드</option>
+                            <option value="가방/의류">가방/의류</option>
+                            <option value="액세서리">액세서리</option>
+                            <option value="기타">기타</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="postDate" class="block font-medium text-slate-700 mb-1">일시 <span class="text-rose-500">*</span></label>
+                        <input type="date" id="postDate" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500">
+                    </div>
+                </div>
+
+                <!-- Location & Contact -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label for="postLocation" class="block font-medium text-slate-700 mb-1">장소 <span class="text-rose-500">*</span></label>
+                        <input type="text" id="postLocation" required placeholder="예: 서울 지하철 2호선" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500">
+                    </div>
+                    <div>
+                        <label for="postContact" class="block font-medium text-slate-700 mb-1">연락처 / 오픈채팅 <span class="text-rose-500">*</span></label>
+                        <input type="text" id="postContact" required placeholder="010-XXXX-XXXX 또는 카카오 ID" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500">
+                    </div>
+                </div>
+
+                <!-- Image Upload / Preset -->
+                <div>
+                    <label class="block font-medium text-slate-700 mb-1">이미지 URL (선택)</label>
+                    <input type="url" id="postImageUrl" placeholder="https://example.com/image.jpg (미입력시 기본 이미지)" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500">
+                </div>
+
+                <!-- Description -->
+                <div>
+                    <label for="postDesc" class="block font-medium text-slate-700 mb-1">상세 설명</label>
+                    <textarea id="postDesc" rows="3" placeholder="특징, 색상, 내부 내용물 등 구체적인 정보를 적어주세요." class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 resize-none"></textarea>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="pt-2">
+                    <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white font-semibold py-3 rounded-xl transition shadow-md shadow-indigo-100 flex items-center justify-center gap-2">
+                        <i data-lucide="check" class="w-5 h-5"></i>
+                        <span>게시글 등록하기</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Detail & Comments Modal -->
+    <div id="detailModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm hidden">
+        <div class="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] flex flex-col shadow-2xl border border-slate-100 overflow-hidden">
+            <!-- Modal Header -->
+            <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+                <span id="modalTypeBadge" class="px-2.5 py-1 rounded-md text-xs font-semibold">분실물</span>
+                <div class="flex items-center gap-2">
+                    <button id="toggleResolveBtn" class="px-3 py-1.5 rounded-lg border border-slate-200 text-xs font-semibold text-slate-700 hover:bg-slate-100 transition flex items-center gap-1.5">
+                        <i data-lucide="check-circle" class="w-4 h-4 text-emerald-600"></i>
+                        <span>완료 상태 변경</span>
+                    </button>
+                    <button id="deletePostBtn" class="p-1.5 text-slate-400 hover:text-rose-600 rounded-lg hover:bg-slate-100 transition" title="게시글 삭제">
+                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                    </button>
+                    <button id="closeDetailBtn" class="p-1.5 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-100">
+                        <i data-lucide="x" class="w-5 h-5"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Content Area -->
+            <div class="p-6 overflow-y-auto space-y-6">
+                <!-- Main Info Header -->
+                <div class="flex flex-col md:flex-row gap-5">
+                    <!-- Image -->
+                    <div class="w-full md:w-1/2 aspect-video md:aspect-square bg-slate-100 rounded-xl overflow-hidden border border-slate-200/60 relative">
+                        <img id="modalImage" src="" alt="물품 이미지" class="w-full h-full object-cover">
+                    </div>
+
+                    <!-- Details -->
+                    <div class="w-full md:w-1/2 flex flex-col justify-between space-y-3">
+                        <div>
+                            <div class="text-xs font-medium text-indigo-600 mb-1" id="modalCategory">전자기기</div>
+                            <h2 id="modalTitle" class="text-xl font-bold text-slate-900 leading-snug">에어팟 프로 습득</h2>
+                            
+                            <div class="mt-4 space-y-2 text-xs sm:text-sm text-slate-600">
+                                <div class="flex items-center gap-2">
+                                    <i data-lucide="map-pin" class="w-4 h-4 text-slate-400 shrink-0"></i>
+                                    <span class="font-medium text-slate-500">장소:</span>
+                                    <span id="modalLocation" class="text-slate-800">강남역 2번 출구</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <i data-lucide="calendar" class="w-4 h-4 text-slate-400 shrink-0"></i>
+                                    <span class="font-medium text-slate-500">일시:</span>
+                                    <span id="modalDate" class="text-slate-800">2026-09-28</span>
+                                </div>
+                                <div class="flex items-center gap-2 bg-indigo-50/70 p-2.5 rounded-xl border border-indigo-100">
+                                    <i data-lucide="phone" class="w-4 h-4 text-indigo-600 shrink-0"></i>
+                                    <span class="font-medium text-indigo-900">연락처:</span>
+                                    <span id="modalContact" class="font-semibold text-indigo-700">010-1234-5678</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="pt-2 text-xs text-slate-400 border-t border-slate-100">
+                            작성일: <span id="modalCreatedAt">2026.09.28</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Description -->
+                <div class="bg-slate-50 p-4 rounded-xl border border-slate-200/60">
+                    <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">상세 내용</h3>
+                    <p id="modalDescription" class="text-sm text-slate-700 whitespace-pre-line leading-relaxed">
+                        상세 정보가 적혀있는 영역입니다.
+                    </p>
+                </div>
+
+                <!-- Comments Section -->
+                <div class="border-t border-slate-100 pt-5">
+                    <h3 class="text-sm font-bold text-slate-900 mb-3 flex items-center gap-1.5">
+                        <i data-lucide="message-square" class="w-4 h-4 text-indigo-600"></i>
+                        <span>댓글 및 문의 (<span id="commentCount">0</span>)</span>
+                    </h3>
+
+                    <!-- Comments List -->
+                    <div id="commentsList" class="space-y-3 max-h-48 overflow-y-auto pr-1 mb-4">
+                        <!-- Comment Item Placeholder -->
+                    </div>
+
+                    <!-- Comment Input -->
+                    <form id="commentForm" class="flex gap-2">
+                        <input type="text" id="commentAuthor" required placeholder="작성자" class="w-24 px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500">
+                        <input type="text" id="commentInput" required placeholder="댓글을 입력하세요..." class="flex-grow px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500">
+                        <button type="submit" class="px-4 py-2 bg-slate-900 text-white rounded-xl text-xs font-medium hover:bg-slate-800 transition shrink-0">
+                            등록
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification Container -->
+    <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+    <script>
+        // Default Sample Data
+        const SAMPLE_POSTS = [
+            {
+                id: 'post-1',
+                type: 'found', // 'lost' | 'found'
+                status: 'active', // 'active' | 'resolved'
+                title: '강남역 2번 출구 근처 에어팟 프로 2세대 습득했습니다',
+                category: '전자기기',
+                location: '서울 강남구 강남역 2번 출구 인근',
+                date: '2026-09-27',
+                contact: '카카오톡 오픈채팅: @AirPodsFind2026',
+                imageUrl: 'https://images.unsplash.com/photo-1600294037681-c80b4cb5b434?w=600&auto=format&fit=crop&q=80',
+                description: '길가에 떨어진 에어팟 케이스(투명 케이스 씌워짐)를 발견했습니다. 본체 안에 귀여운 스티커가 붙어있네요. 본인 확인을 위해 스티커 모양을 말씀해주세요.',
+                createdAt: '2026-09-27 14:30',
+                comments: [
+                    { id: 'c1', author: '손님1', text: '혹시 케이스에 곰돌이 스티커 붙어있나요?', createdAt: '2026-09-27 15:10' },
+                    { id: 'c2', author: '작성자', text: '네 맞습니다! 개인 메시지 부탁드립니다.', createdAt: '2026-09-27 15:25' }
+                ]
+            },
+            {
+                id: 'post-2',
+                type: 'lost',
+                status: 'active',
+                title: '홍대입구역 부근 에르메스 가죽 지갑 분실',
+                category: '지갑/신용카드',
+                location: '서울 마포구 홍대입구역 9번 출구 카페거리',
+                date: '2026-09-26',
+                contact: '010-9876-5432',
+                imageUrl: 'https://images.unsplash.com/photo-1627123424574-724758594e93?w=600&auto=format&fit=crop&q=80',
+                description: '검은색 가죽 지갑입니다. 안에 신분증과 신용카드 2장, 약간의 현금이 들어있습니다. 사례금 꼭 드리겠습니다. 연락 부탁드립니다!',
+                createdAt: '2026-09-26 18:20',
+                comments: []
+            },
+            {
+                id: 'post-3',
+                type: 'found',
+                status: 'resolved',
+                title: '아이폰 15 스페이스 블랙 습득 (주인 찾음)',
+                category: '전자기기',
+                location: '여의도 한강공원 잔디밭',
+                date: '2026-09-25',
+                contact: '010-5555-1234',
+                imageUrl: 'https://images.unsplash.com/photo-1510557880182-3d4d3cba35a5?w=600&auto=format&fit=crop&q=80',
+                description: '주인분께서 연락주셔서 안전하게 돌려드렸습니다.',
+                createdAt: '2026-09-25 11:00',
+                comments: [
+                    { id: 'c3', author: '감사합니다', text: '소중한 핸드폰 찾아주셔서 정말 감사합니다!', createdAt: '2026-09-25 16:40' }
+                ]
+            },
+            {
+                id: 'post-4',
+                type: 'lost',
+                status: 'active',
+                title: '성수동 카페에서 프라다 백팩 분실했습니다',
+                category: '가방/의류',
+                location: '서울 성동구 성수동 연무장길 카페',
+                date: '2026-09-28',
+                contact: '010-3333-7777',
+                imageUrl: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=600&auto=format&fit=crop&q=80',
+                description: '검정색 나일론 백팩입니다. 내부 노트북 파우치에 서류와 노트북이 들어있습니다.',
+                createdAt: '2026-09-28 09:15',
+                comments: []
+            }
+        ];
+
+        // App State
+        let posts = [];
+        let activeStatusFilter = 'all';
+        let activeCategoryFilter = 'all';
+        let searchQuery = '';
+        let viewMode = 'grid'; // 'grid' | 'list'
+        let currentDetailPostId = null;
+
+        // Category Default Icons & Images mapping
+        const categoryConfig = {
+            '전자기기': { icon: 'smartphone', defaultImg: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=600&auto=format&fit=crop&q=80' },
+            '지갑/신용카드': { icon: 'wallet', defaultImg: 'https://images.unsplash.com/photo-1627123424574-724758594e93?w=600&auto=format&fit=crop&q=80' },
+            '가방/의류': { icon: 'shopping-bag', defaultImg: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=600&auto=format&fit=crop&q=80' },
+            '액세서리': { icon: 'watch', defaultImg: 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=600&auto=format&fit=crop&q=80' },
+            '기타': { icon: 'more-horizontal', defaultImg: 'https://images.unsplash.com/photo-1584438784894-089d6a62b8fa?w=600&auto=format&fit=crop&q=80' }
+        };
+
+        // DOM Elements
+        const postsContainer = document.getElementById('postsContainer');
+        const emptyState = document.getElementById('emptyState');
+        const searchInput = document.getElementById('searchInput');
+        const gridViewBtn = document.getElementById('gridViewBtn');
+        const listViewBtn = document.getElementById('listViewBtn');
+
+        // Modals
+        const newPostModal = document.getElementById('newPostModal');
+        const openNewPostBtn = document.getElementById('openNewPostBtn');
+        const closeNewPostBtn = document.getElementById('closeNewPostBtn');
+        const postForm = document.getElementById('postForm');
+
+        const detailModal = document.getElementById('detailModal');
+        const closeDetailBtn = document.getElementById('closeDetailBtn');
+        const toggleResolveBtn = document.getElementById('toggleResolveBtn');
+        const deletePostBtn = document.getElementById('deletePostBtn');
+        const commentForm = document.getElementById('commentForm');
+
+        // Initialize Application
+        window.addEventListener('DOMContentLoaded', () => {
+            loadPostsFromStorage();
+            setupEventListeners();
+            renderPosts();
+            lucide.createIcons();
+        });
+
+        // Load or Initialize LocalStorage Data
+        function loadPostsFromStorage() {
+            const saved = localStorage.getItem('lost_found_posts');
+            if (saved) {
+                try {
+                    posts = JSON.parse(saved);
+                } catch (e) {
+                    posts = [...SAMPLE_POSTS];
+                }
+            } else {
+                posts = [...SAMPLE_POSTS];
+                savePostsToStorage();
+            }
+        }
+
+        function savePostsToStorage() {
+            localStorage.setItem('lost_found_posts', JSON.stringify(posts));
+        }
+
+        function setupEventListeners() {
+            // Search Input
+            searchInput.addEventListener('input', (e) => {
+                searchQuery = e.target.value.trim().toLowerCase();
+                renderPosts();
+            });
+
+            // Status Filters
+            document.querySelectorAll('#statusFilterGroup button').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('#statusFilterGroup button').forEach(b => {
+                        b.classList.remove('bg-white', 'text-indigo-600', 'shadow-sm', 'font-semibold');
+                        b.classList.add('hover:text-slate-900');
+                    });
+                    btn.classList.add('bg-white', 'text-indigo-600', 'shadow-sm', 'font-semibold');
+                    btn.classList.remove('hover:text-slate-900');
+
+                    activeStatusFilter = btn.dataset.status;
+                    renderPosts();
+                });
+            });
+
+            // Category Filters
+            document.querySelectorAll('#categoryFilterGroup button').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('#categoryFilterGroup button').forEach(b => {
+                        b.className = 'cat-chip flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 font-medium whitespace-nowrap text-xs transition';
+                    });
+                    btn.className = 'cat-chip flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border border-indigo-600 bg-indigo-50 text-indigo-700 font-medium whitespace-nowrap text-xs transition';
+
+                    activeCategoryFilter = btn.dataset.cat;
+                    renderPosts();
+                });
+            });
+
+            // View Mode Toggle
+            gridViewBtn.addEventListener('click', () => {
+                viewMode = 'grid';
+                gridViewBtn.className = 'p-1.5 rounded-lg text-indigo-600 bg-white shadow-sm transition';
+                listViewBtn.className = 'p-1.5 rounded-lg text-slate-500 hover:text-slate-900 transition';
+                renderPosts();
+            });
+
+            listViewBtn.addEventListener('click', () => {
+                viewMode = 'list';
+                listViewBtn.className = 'p-1.5 rounded-lg text-indigo-600 bg-white shadow-sm transition';
+                gridViewBtn.className = 'p-1.5 rounded-lg text-slate-500 hover:text-slate-900 transition';
+                renderPosts();
+            });
+
+            // New Post Modal Toggle
+            openNewPostBtn.addEventListener('click', () => {
+                // Set default date to today
+                document.getElementById('postDate').value = new Date().toISOString().split('T')[0];
+                newPostModal.classList.remove('hidden');
+            });
+            closeNewPostBtn.addEventListener('click', () => newPostModal.classList.add('hidden'));
+
+            // Submit New Post
+            postForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const formData = new FormData(postForm);
+                const type = formData.get('type');
+                const category = document.getElementById('postCategory').value;
+                const userImg = document.getElementById('postImageUrl').value.trim();
+
+                const newPost = {
+                    id: 'post-' + Date.now(),
+                    type: type,
+                    status: 'active',
+                    title: document.getElementById('postTitle').value.trim(),
+                    category: category,
+                    location: document.getElementById('postLocation').value.trim(),
+                    date: document.getElementById('postDate').value,
+                    contact: document.getElementById('postContact').value.trim(),
+                    imageUrl: userImg || (categoryConfig[category] ? categoryConfig[category].defaultImg : categoryConfig['기타'].defaultImg),
+                    description: document.getElementById('postDesc').value.trim() || '상세 정보가 적혀있지 않습니다.',
+                    createdAt: new Date().toISOString().replace('T', ' ').substring(0, 16),
+                    comments: []
+                };
+
+                posts.unshift(newPost);
+                savePostsToStorage();
+                renderPosts();
+                
+                postForm.reset();
+                newPostModal.classList.add('hidden');
+                showToast('게시글이 성공적으로 등록되었습니다.');
+            });
+
+            // Detail Modal Close
+            closeDetailBtn.addEventListener('click', () => detailModal.classList.add('hidden'));
+
+            // Toggle Resolved Status
+            toggleResolveBtn.addEventListener('click', () => {
+                if (!currentDetailPostId) return;
+                const post = posts.find(p => p.id === currentDetailPostId);
+                if (post) {
+                    post.status = post.status === 'resolved' ? 'active' : 'resolved';
+                    savePostsToStorage();
+                    renderPosts();
+                    openDetailModal(post.id);
+                    showToast(post.status === 'resolved' ? '완료 처리되었습니다.' : '진행중 상태로 변경되었습니다.');
+                }
+            });
+
+            // Delete Post
+            deletePostBtn.addEventListener('click', () => {
+                if (!currentDetailPostId) return;
+                if (confirm('정말로 이 게시글을 삭제하시겠습니까?')) {
+                    posts = posts.filter(p => p.id !== currentDetailPostId);
+                    savePostsToStorage();
+                    renderPosts();
+                    detailModal.classList.add('hidden');
+                    showToast('게시글이 삭제되었습니다.');
+                }
+            });
+
+            // Submit Comment
+            commentForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                if (!currentDetailPostId) return;
+
+                const authorInput = document.getElementById('commentAuthor');
+                const textInput = document.getElementById('commentInput');
+
+                const post = posts.find(p => p.id === currentDetailPostId);
+                if (post) {
+                    post.comments.push({
+                        id: 'c-' + Date.now(),
+                        author: authorInput.value.trim(),
+                        text: textInput.value.trim(),
+                        createdAt: new Date().toISOString().replace('T', ' ').substring(0, 16)
+                    });
+
+                    savePostsToStorage();
+                    renderDetailComments(post.comments);
+                    renderPosts();
+
+                    textInput.value = '';
+                    showToast('댓글이 등록되었습니다.');
+                }
+            });
+
+            // Close modals on outside click
+            window.addEventListener('click', (e) => {
+                if (e.target === newPostModal) newPostModal.classList.add('hidden');
+                if (e.target === detailModal) detailModal.classList.add('hidden');
+            });
+        }
+
+        function renderPosts() {
+            // Filter Posts
+            const filtered = posts.filter(post => {
+                // Status Filter
+                if (activeStatusFilter === 'lost' && (post.type !== 'lost' || post.status === 'resolved')) return false;
+                if (activeStatusFilter === 'found' && (post.type !== 'found' || post.status === 'resolved')) return false;
+                if (activeStatusFilter === 'resolved' && post.status !== 'resolved') return false;
+
+                // Category Filter
+                if (activeCategoryFilter !== 'all' && post.category !== activeCategoryFilter) return false;
+
+                // Search Query
+                if (searchQuery) {
+                    const matchTitle = post.title.toLowerCase().includes(searchQuery);
+                    const matchLocation = post.location.toLowerCase().includes(searchQuery);
+                    const matchDesc = post.description.toLowerCase().includes(searchQuery);
+                    const matchCategory = post.category.toLowerCase().includes(searchQuery);
+                    if (!matchTitle && !matchLocation && !matchDesc && !matchCategory) return false;
+                }
+
+                return true;
+            });
+
+            if (filtered.length === 0) {
+                postsContainer.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                return;
+            } else {
+                emptyState.classList.add('hidden');
+            }
+
+            // Grid vs List Layout classes
+            if (viewMode === 'grid') {
+                postsContainer.className = 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5';
+            } else {
+                postsContainer.className = 'flex flex-col gap-3';
+            }
+
+            postsContainer.innerHTML = filtered.map(post => {
+                const isResolved = post.status === 'resolved';
+                const isLost = post.type === 'lost';
+
+                // Status Badge styling
+                let badgeHTML = '';
+                if (isResolved) {
+                    badgeHTML = `<span class="bg-emerald-100 text-emerald-700 border border-emerald-200 text-xs px-2.5 py-0.5 rounded-full font-semibold">찾음 완료</span>`;
+                } else if (isLost) {
+                    badgeHTML = `<span class="bg-rose-100 text-rose-700 border border-rose-200 text-xs px-2.5 py-0.5 rounded-full font-semibold">분실해요</span>`;
+                } else {
+                    badgeHTML = `<span class="bg-blue-100 text-blue-700 border border-blue-200 text-xs px-2.5 py-0.5 rounded-full font-semibold">습득했어요</span>`;
+                }
+
+                if (viewMode === 'grid') {
+                    return `
+                        <div onclick="openDetailModal('${post.id}')" class="group bg-white rounded-2xl border border-slate-200/80 overflow-hidden shadow-sm hover:shadow-md hover:border-indigo-200 transition cursor-pointer flex flex-col ${isResolved ? 'opacity-75 bg-slate-50/50' : ''}">
+                            <!-- Image -->
+                            <div class="relative w-full aspect-[4/3] bg-slate-100 overflow-hidden">
+                                <img src="${post.imageUrl}" alt="${post.title}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" onerror="this.src='https://placehold.co/600x400/f1f5f9/94a3b8?text=No+Image'">
+                                <div class="absolute top-3 left-3 flex gap-1">
+                                    ${badgeHTML}
+                                </div>
+                            </div>
+                            
+                            <!-- Content -->
+                            <div class="p-4 flex flex-col flex-grow justify-between space-y-3">
+                                <div>
+                                    <div class="text-[11px] font-medium text-indigo-600 mb-1 flex items-center gap-1">
+                                        <span>${post.category}</span>
+                                    </div>
+                                    <h3 class="font-bold text-slate-900 line-clamp-1 group-hover:text-indigo-600 transition text-sm sm:text-base">${post.title}</h3>
+                                    <p class="text-xs text-slate-500 line-clamp-2 mt-1.5 leading-relaxed">${post.description}</p>
+                                </div>
+
+                                <div class="pt-3 border-t border-slate-100 text-xs text-slate-500 space-y-1">
+                                    <div class="flex items-center gap-1.5 truncate">
+                                        <i data-lucide="map-pin" class="w-3.5 h-3.5 text-slate-400 shrink-0"></i>
+                                        <span class="truncate">${post.location}</span>
+                                    </div>
+                                    <div class="flex items-center justify-between pt-1">
+                                        <span class="flex items-center gap-1 text-[11px] text-slate-400">
+                                            <i data-lucide="calendar" class="w-3 h-3"></i>
+                                            ${post.date}
+                                        </span>
+                                        <span class="flex items-center gap-1 text-[11px] text-slate-400">
+                                            <i data-lucide="message-square" class="w-3 h-3"></i>
+                                            ${post.comments ? post.comments.length : 0}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    // List View Item
+                    return `
+                        <div onclick="openDetailModal('${post.id}')" class="group bg-white rounded-2xl border border-slate-200/80 p-3 sm:p-4 shadow-sm hover:shadow-md hover:border-indigo-200 transition cursor-pointer flex items-center gap-4 ${isResolved ? 'opacity-75 bg-slate-50/50' : ''}">
+                            <!-- Thumbnail -->
+                            <div class="w-20 h-20 sm:w-24 sm:h-24 rounded-xl bg-slate-100 overflow-hidden shrink-0 relative">
+                                <img src="${post.imageUrl}" alt="${post.title}" class="w-full h-full object-cover group-hover:scale-105 transition" onerror="this.src='https://placehold.co/200x200/f1f5f9/94a3b8?text=No+Image'">
+                            </div>
+
+                            <!-- Details -->
+                            <div class="flex-grow min-w-0 space-y-1">
+                                <div class="flex items-center gap-2">
+                                    ${badgeHTML}
+                                    <span class="text-xs font-medium text-indigo-600 truncate">${post.category}</span>
+                                </div>
+                                <h3 class="font-bold text-slate-900 text-sm sm:text-base truncate group-hover:text-indigo-600 transition">${post.title}</h3>
+                                <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-500 pt-1">
+                                    <span class="flex items-center gap-1">
+                                        <i data-lucide="map-pin" class="w-3.5 h-3.5 text-slate-400"></i>
+                                        ${post.location}
+                                    </span>
+                                    <span class="flex items-center gap-1">
+                                        <i data-lucide="calendar" class="w-3.5 h-3.5 text-slate-400"></i>
+                                        ${post.date}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <!-- Right Arrow Icon -->
+                            <div class="pr-2 text-slate-300 group-hover:text-indigo-600 transition">
+                                <i data-lucide="chevron-right" class="w-5 h-5"></i>
+                            </div>
+                        </div>
+                    `;
+                }
+            }).join('');
+
+            lucide.createIcons();
+        }
+
+        function openDetailModal(postId) {
+            const post = posts.find(p => p.id === postId);
+            if (!post) return;
+
+            currentDetailPostId = postId;
+
+            // Set Modal Details
+            const isResolved = post.status === 'resolved';
+            const isLost = post.type === 'lost';
+
+            const modalTypeBadge = document.getElementById('modalTypeBadge');
+            if (isResolved) {
+                modalTypeBadge.className = 'px-2.5 py-1 rounded-md text-xs font-semibold bg-emerald-100 text-emerald-700';
+                modalTypeBadge.innerText = '찾음 완료';
+            } else if (isLost) {
+                modalTypeBadge.className = 'px-2.5 py-1 rounded-md text-xs font-semibold bg-rose-100 text-rose-700';
+                modalTypeBadge.innerText = '분실 게시글';
+            } else {
+                modalTypeBadge.className = 'px-2.5 py-1 rounded-md text-xs font-semibold bg-blue-100 text-blue-700';
+                modalTypeBadge.innerText = '습득 게시글';
+            }
+
+            document.getElementById('modalTitle').innerText = post.title;
+            document.getElementById('modalCategory').innerText = post.category;
+            document.getElementById('modalLocation').innerText = post.location;
+            document.getElementById('modalDate').innerText = post.date;
+            document.getElementById('modalContact').innerText = post.contact;
+            document.getElementById('modalDescription').innerText = post.description;
+            document.getElementById('modalCreatedAt').innerText = post.createdAt;
+            document.getElementById('modalImage').src = post.imageUrl;
+
+            // Render Comments
+            renderDetailComments(post.comments || []);
+
+            detailModal.classList.remove('hidden');
+            lucide.createIcons();
+        }
+
+        function renderDetailComments(comments) {
+            const commentsList = document.getElementById('commentsList');
+            document.getElementById('commentCount').innerText = comments.length;
+
+            if (comments.length === 0) {
+                commentsList.innerHTML = `<p class="text-xs text-slate-400 py-2 text-center">등록된 댓글이 없습니다. 첫 댓글을 남겨보세요!</p>`;
+                return;
+            }
+
+            commentsList.innerHTML = comments.map(c => `
+                <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 text-xs space-y-1">
+                    <div class="flex justify-between items-center">
+                        <span class="font-bold text-slate-800">${escapeHtml(c.author)}</span>
+                        <span class="text-[10px] text-slate-400">${c.createdAt}</span>
+                    </div>
+                    <p class="text-slate-600 leading-relaxed">${escapeHtml(c.text)}</p>
+                </div>
+            `).join('');
+        }
+
+        // Utility: Toast Message
+        function showToast(message) {
+            const toastContainer = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = 'bg-slate-900 text-white text-xs sm:text-sm px-4 py-3 rounded-xl shadow-lg border border-slate-700/50 flex items-center gap-2 transform transition-all duration-300 translate-y-4 opacity-0 pointer-events-auto';
+            toast.innerHTML = `
+                <i data-lucide="info" class="w-4 h-4 text-indigo-400"></i>
+                <span>${escapeHtml(message)}</span>
+            `;
+            
+            toastContainer.appendChild(toast);
+            lucide.createIcons();
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-4', 'opacity-0');
+            }, 10);
+
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-2');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // Utility: XSS Defense
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/&/g, "&amp;")
+                      .replace(/</g, "&lt;")
+                      .replace(/>/g, "& letters;")
+                      .replace(/"/g, "&quot;")
+                      .replace(/'/g, "&#039;");
+        }
+    </script>
+</body>
+</html>
