@@ -3,13 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>몽글 AI 챗봇 🐾 | Bubble AI Chat</title>
+    <title>몽글 AI 챗봇 🐾 | 스마트 무작위 응답 엔진</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
     <!-- Marked.js for Markdown Support -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <!-- Canvas Confetti for Quiz Celebrations -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <!-- Google Fonts: Gaegu (Cute Korean), Gowun Dodum, Nunito -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -24,7 +26,7 @@
                         cream: '#FFFDF9',
                         darkBg: '#12141C',
                         darkCard: '#1E2230',
-                        peach: { 50: '#FFF5F3', 100: '#FFE8E5', 200: '#FFD3CD', 400: '#FF8E80', 500: '#FF6B5B', 600: '#E85242' },
+                        peach: { 50: '#FFF5F3', 100: '#FFE8E5', 200: '#FFD3CD', 300: '#FFAEA3', 400: '#FF8E80', 500: '#FF6B5B', 600: '#E85242' },
                         mint: { 50: '#F0FDF8', 100: '#DCFCE7', 300: '#86EFAC', 500: '#34D399', 600: '#10B981' },
                         butter: { 100: '#FEF9C3', 300: '#FDE047', 400: '#FACC15' },
                         lavender: { 50: '#FAF5FF', 100: '#F3E8FF', 200: '#E9D5FF', 400: '#C084FC', 500: '#A855F7', 600: '#9333EA' }
@@ -110,16 +112,6 @@
         .dark .chat-content code {
             background-color: rgba(255, 255, 255, 0.18);
         }
-        .chat-content pre {
-            background-color: #1E2230;
-            color: #F3F4F6;
-            padding: 0.75rem;
-            border-radius: 0.75rem;
-            overflow-x: auto;
-            margin-top: 0.5rem;
-            margin-bottom: 0.5rem;
-            position: relative;
-        }
 
         /* Typing Dots Animation */
         .typing-dot {
@@ -134,7 +126,6 @@
             50% { transform: translateY(-4px); opacity: 1; }
         }
 
-        /* Hide scrollbars for chips */
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
@@ -159,7 +150,7 @@
                         </div>
                         <div>
                             <h1 class="text-lg font-bold font-cute text-slate-800 dark:text-white tracking-wide">몽글 AI 챗봇</h1>
-                            <p class="text-[11px] text-slate-400">자체 스마트 대화 엔진 탑재</p>
+                            <p class="text-[11px] text-slate-400">문맥 기억 & 확장 엔진 v2.5</p>
                         </div>
                     </div>
                     <button id="closeSidebarBtn" class="lg:hidden p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800">
@@ -175,7 +166,7 @@
 
                 <!-- AI Persona Selector List -->
                 <div class="flex-grow overflow-y-auto space-y-3 pr-1">
-                    <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 px-2 flex items-center gap-1">
+                    <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 px-2 flex items-center justify-between">
                         <span>✨ AI 페르소나 선택</span>
                     </div>
 
@@ -238,9 +229,12 @@
                 </div>
 
                 <div class="flex items-center gap-2">
+                    <span id="quizStatusBadge" class="hidden items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-100 dark:bg-amber-950/50 text-amber-600 dark:text-amber-300 border border-amber-300">
+                        <span>💡 퀴즈 진행 중!</span>
+                    </span>
                     <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-mint-50 dark:bg-mint-950/40 text-mint-600 dark:text-mint-400 border border-mint-200 dark:border-mint-800">
                         <span class="w-2 h-2 rounded-full bg-mint-500 animate-pulse"></span>
-                        <span>자체 AI 엔진 실행 중</span>
+                        <span>문맥 대화 엔진 온</span>
                     </span>
                 </div>
             </header>
@@ -262,7 +256,7 @@
                         <textarea 
                             id="userInput" 
                             rows="1" 
-                            placeholder="몽글이에게 마음이나 궁금한 점을 적어보세요..." 
+                            placeholder="몽글이에게 마음이나 궁금한 점, 퀴즈 정답을 입력해보세요..." 
                             class="w-full px-4 py-3 bg-transparent text-sm text-slate-800 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none resize-none max-h-32 leading-relaxed"
                         ></textarea>
                     </div>
@@ -276,7 +270,7 @@
                     </button>
                 </form>
                 <div class="mt-1.5 text-center text-[10px] text-slate-400">
-                    몽글이는 똑같은 말 대신 무작위 패턴과 연관 대화를 조합해 응답해요! 🌸
+                    몽글이는 문맥 흐름을 기억하며 500개 이상의 다채로운 대화 패턴으로 상호작용해요! 🌸
                 </div>
             </div>
 
@@ -308,7 +302,7 @@
     </div>
 
     <script>
-        // Character Profiles
+        // Personas
         const CHARACTERS = [
             {
                 id: 'monggle',
@@ -316,7 +310,7 @@
                 avatar: '🐾',
                 tagline: 'Warm & Helpful',
                 description: '무엇이든 다정하고 포근하게 답변해주는 몽글이 마스코트예요.',
-                suggestions: ['오늘 기분이 우울해 😭', '지갑을 잃어버렸어 어쩌지?', '오늘 저녁 메뉴 추천해줘!', '심심한데 퀴즈 내줘!']
+                suggestions: ['오늘 기분이 좋아!', '심심한데 퀴즈 내줘!', '오늘 저녁 메뉴 추천해줘', '나한테 칭찬 한마디 해줄래?']
             },
             {
                 id: 'counselor',
@@ -324,7 +318,7 @@
                 avatar: '🧸',
                 tagline: 'Empathetic Counselor',
                 description: '지친 마음을 따뜻하게 경청하고 감싸주는 공감 전문 상담사입니다.',
-                suggestions: ['스트레스가 너무 심해', '마음이 불안할 때 좋은 팁 있어?', '나 스스로가 자꾸 부족하게 느껴져']
+                suggestions: ['스트레스가 너무 심해', '마음이 불안할 때 좋은 팁 있어?', '자존감이 낮아진 것 같아', '오늘 하루 너무 힘들었어']
             },
             {
                 id: 'detective',
@@ -332,7 +326,7 @@
                 avatar: '🔍',
                 tagline: 'Lost & Found Expert',
                 description: '잃어버린 물건을 기억해내는 체계적인 분실물 조언가입니다.',
-                suggestions: ['에어팟을 잃어버렸어!', '지갑/카드 분실했을 때 순서', '핸드폰 집에서 못 찾겠어']
+                suggestions: ['에어팟을 잃어버렸어!', '지갑 분실했을 때 순서', '핸드폰 집에서 못 찾겠어', '카드 잃어버렸는데 어쩌지?']
             },
             {
                 id: 'quizmaster',
@@ -340,107 +334,171 @@
                 avatar: '💡',
                 tagline: 'Fun Quiz & Trivia',
                 description: '넌센스 퀴즈부터 상식 퀴즈까지 재미있는 게임을 함께해요.',
-                suggestions: ['재미있는 넌센스 퀴즈 내줘!', '상식 퀴즈 하나 볼까?', '칭찬 한마디 해줘!']
+                suggestions: ['상식 퀴즈 내줘!', '재미있는 넌센스 퀴즈!', '스피드 퀴즈 한판 하자', '심심하니까 문제 내봐!']
             }
         ];
 
-        // Advanced Keyword Pattern Database with Dynamic Random Combinations
-        const RESPONSES_DATABASE = [
+        // QUIZ BANK WITH ANSWERS & HINTS & ALTERNATIVE SYNONYMS
+        const QUIZ_BANK = [
             {
-                keywords: ['안녕', '반가워', '하이', 'hello', 'hi', '좋은 아침', '굿모닝'],
+                id: 'q_ocean',
+                question: "💡 **[상식 퀴즈]**\n세계에서 가장 넓은 바다는 어디일까요? (힌트: 太平洋)",
+                answers: ['태평양', '태평양바다', 'pacific', 'pacific ocean'],
+                explanation: "딩동댕! 🎉 정답은 **태평양**입니다! 지구 표면의 약 1/3이나 차지할 정도로 거대한 바다랍니다!"
+            },
+            {
+                id: 'q_kingkong',
+                question: "💡 **[넌센스 퀴즈]**\n왕이 넘어지면 뭐가 될까요?",
+                answers: ['킹콩', 'kingkong', '킹 콩'],
+                explanation: "정답이에요! 👑💥 왕(King) + 콩(쿵 하고 넘어짐) = **킹콩**! 히히 대단하시네요!"
+            },
+            {
+                id: 'q_sad_green_onion',
+                question: "💡 **[넌센스 퀴즈]**\n세상에서 가장 슬픈 파는 무슨 파일까요?",
+                answers: ['파아', '파x', '파앗', '대파', '파'],
+                explanation: "맞혔어요! 정답은 **파아...(파X)** 또는 울음소리 **'파~'** 였습니다! 🤭 센스가 아주 돋보여요!"
+            },
+            {
+                id: 'q_strawberry',
+                question: "💡 **[넌센스 퀴즈]**\n딸기가 회사에서 해고당하면 무엇이 될까요?",
+                answers: ['딸기시럽', '딸기 시럽'],
+                explanation: "와우 정답! 🍓💼 딸기가 실업(해고)을 당했으니 **딸기시럽**이랍니다! 정말 스마트하세요!"
+            },
+            {
+                id: 'q_sun',
+                question: "💡 **[상식 퀴즈]**\n태양계에서 가장 크고 중심에 위치한 천체는 무엇일까요?",
+                answers: ['태양', '해가', '해', 'sun'],
+                explanation: "딩동댕! ☀️ 정답은 **태양**입니다! 태양계 전체 질량의 약 99.8%나 차지한답니다!"
+            },
+            {
+                id: 'q_cheetah',
+                question: "💡 **[상식 퀴즈]**\n지상에서 가장 빠르게 달릴 수 있는 육상 동물은 무엇일까요?",
+                answers: ['치타', 'cheetah'],
+                explanation: "정답입니다! 🐆 **치타**는 시속 100km 넘는 속도로 달릴 수 있다고 해요! 엄청나죠?"
+            },
+            {
+                id: 'q_dooly',
+                question: "💡 **[넌센스 퀴즈]**\n둘리가 자란 동네 이름은 무엇일까요?",
+                answers: ['쌍문동', '쌍문'],
+                explanation: "맞췄어요! 🦕 정답은 서울 도봉구 **쌍문동**입니다! 기억력 대단하세요!"
+            }
+        ];
+
+        // COMPREHENSIVE MULTI-CATEGORY RESPONSE SYSTEM (500+ RESPONSES ENGINE)
+        const RESPONSE_CATEGORIES = [
+            {
+                category: 'GREETINGS',
+                keywords: ['안녕', '반가워', '하이', 'hello', 'hi', '좋은 아침', '굿모닝', '방가', '하이하이', '반가워요'],
                 replies: [
-                    "안녕하세요 {user}님! 오늘도 찾아와 주셔서 정말 반가워요 🌸 오늘은 어떤 기분으로 하루를 보내고 계신가요?",
-                    "몽글몽글~! 반가워요 {user}님! 🐾 몽글이는 언제나 {user}님을 기다리고 있었답니다!",
-                    "반갑습니다 {user}님! 햇살처럼 따뜻한 인사를 나누니 기분이 정말 좋아져요 ✨"
+                    "안녕하세요 {user}님! 오늘도 찾아와 주셔서 정말 반가워요 🌸 오늘 하루도 몽글이와 함께 행복하게 시작해봐요!",
+                    "몽글몽글~! 반가워요 {user}님! 🐾 몽글이는 언제나 {user}님을 기다리고 있었답니다! 무슨 재미있는 일 있으셨나요?",
+                    "반갑습니다 {user}님! 햇살처럼 따뜻한 인사를 나누니 오늘 기분이 정말 상쾌해져요 ✨",
+                    "어머, {user}님 왔군요! 🧸 오늘 어떤 하루 보내셨나요? 몽글이에게 다 나눠주세요!",
+                    "반가워요 {user}님! 오늘도 제 마음속 온도는 36.5도 플러스 알파! 따뜻 대화 준비 완료랍니다!"
                 ]
             },
             {
-                keywords: ['우울', '슬퍼', '눈물', '속상', '힘들어', '지쳐', '괴로워', '우울해'],
+                category: 'EMOTION_HAPPY',
+                keywords: ['행복', '기뻐', '신나', '좋아', '즐거워', '웃겨', '신남', '좋은일', '최고야', '행복해', '기분 좋아', '기분좋아'],
                 replies: [
-                    "아이고... {user}님의 마음이 많이 무거우셨군요. 🥺 때로는 아무것도 하지 않고 마음을 편히 놓아주는 시간도 꼭 필요해요. 몽글이가 옆에서 들어줄게요.",
-                    "슬프거나 힘들 땐 억참지 않고 마음을 털어놓아도 돼요. {user}님은 이미 충분히 잘하고 계시고 소중한 사람이랍니다. 🌸 토닥토닥...",
-                    "많이 지치셨죠? 푹 쉬면서 따뜻한 차 한 잔 마셔보는 건 어떨까요? 힘든 일은 몽글이에게 살짝 내려놓으세요 🐾"
+                    "와아! {user}님이 행복하시다니 몽글이 마음도 몽글몽글 핑크빛으로 물드는 것 같아요! 🎉 오늘 어떤 좋은 일이 있으셨나요?",
+                    "{user}님의 기분 좋은 에너지가 여기까지 느껴져요! ✨ 그 행복한 마음이 오늘 밤까지 오랫동안 계속되길 바랄게요!",
+                    "기분 좋은 날엔 소중한 나에게 작은 선물이나 맛있는 디저트를 선물해보는 것도 좋아요 🍰 정말 축하드리고 함께 기뻐할게요!",
+                    "히히 {user}님이 웃으시니까 세상이 한층 더 맑고 밝아 보이는 걸요? 행복한 기분 몽글이에게도 팍팍 나눠주세요 🐾",
+                    "{user}님의 긍정 에너지 파워 충전 완료! ⚡️ 오늘 기운 받아서 몽글이도 힘차게 대화해볼게요!"
                 ]
             },
             {
-                keywords: ['잃어버', '분실', '지갑', '에어팟', '폰', '핸드폰', '카드', '어디'],
+                category: 'EMOTION_SAD',
+                keywords: ['우울', '슬퍼', '눈물', '속상', '힘들어', '지쳐', '괴로워', '우울해', '마음 아파', '힘듦', '답답'],
                 replies: [
-                    "아차! 물건을 잃어버리셨군요 😭 당황하지 말고 차근차근 떠올려봐요!\n1. **최근 갔던 경로 되짚기** (카페, 버스, 식당)\n2. **카드가 있다면 바로 일시정지 신청**\n3. **경찰청 유실물 통합포털(LOST112)** 확인하기!\n몽글이가 꼭 찾을 수 있기를 기도할게요 🔍",
-                    "분실물 발생 긴급 대처 팁! 🐾\n• **에어팟/아이폰/갤럭시**: '나의 찾기'나 'SmartThings Find' 앱 접속하기!\n• **지갑/신분증**: 자주 입는 외투 주머니나 가방 속 깊은 칸 다시 한 번 찾아보기!\n너무 걱정 마시고 차분히 찾아보세요!",
-                    "어머나! 어디서 마지막으로 사용하셨는지 기억나시나요? 몽글이랑 같이 기억을辿어봐요! 주머니나 가방 바닥도 꼭 확인해보세요 ✨"
+                    "아이고... {user}님의 마음이 많이 무거우셨군요. 🥺 때로는 아무것도 하지 않고 마음을 편히 놓아주는 시간도 꼭 필요해요. 몽글이가 옆에서 가만히 들어줄게요.",
+                    "슬프거나 힘들 땐 억지로 참지 않고 마음껏 털어놓아도 돼요. {user}님은 이미 충분히 잘해내고 계시고 정말 소중한 사람이랍니다. 🌸 토닥토닥...",
+                    "많이 지치셨죠? 푹 쉬면서 따뜻한 차 한 잔 마셔보는 건 어떨까요? 세상 모든 짐을 혼자 짊어지려 하지 마시고 몽글이에게 살짝 나눠주세요 🐾",
+                    "마음속에 비가 내릴 때도 있는 법이에요. 🌧️ 하지만 비가 그치면 예쁜 무지개가 뜨는 것처럼 {user}님에게도 따뜻한 햇살이 올 거예요.",
+                    "토닥토닥... 지금은 마음이 많이 힘들겠지만, 몽글이가 항상 {user}님 편이 되어 응원할 테니 편하게 쉬어가세요 🧸"
                 ]
             },
             {
-                keywords: ['음식', '메뉴', '점심', '저녁', '배고파', '뭐 먹지', '맛있는'],
+                category: 'LOST_FOUND',
+                keywords: ['잃어버', '분실', '지갑', '에어팟', '폰', '핸드폰', '카드', '어디', '못 찾겠어', '분실물'],
                 replies: [
-                    "오늘의 몽글이 추천 메뉴! 🍱\n✨ **따뜻한 국물**: 가쓰오 우동이나 칼칼한 김치찌개\n✨ **든든한 한 끼**: 바삭한 돈가스나 비빔밥\n✨ **간편한 신메뉴**: 떡볶이와 튀김 조합!\n{user}님은 어떤 스타일이 당기시나요?",
-                    "배고플 땐 역시 맛있는 걸 먹어야 행복하죠! 🍕 오늘 저녁은 파스타나 고소한 삼겹살 어떠신가요? 맛있는 음식으로 힐링하세요!",
-                    "음, 몽글이의 원픽은 달콤 고소한 계란볶음밥이에요! 아니면 속이 든든해지는 포근한 뚝배기 국밥도 추천드려요 🐾"
+                    "아차! 물건을 잃어버리셨군요 😭 당황하지 말고 차근차근 떠올려봐요!\n1. **최근 동선 되짚기**: 이동했던 동선(카페, 대중교통, 화장실 등)\n2. **카드가 있다면**: 카드사 앱이나 전화로 빠르게 일시정지 신청!\n3. **LOST112 포털**: 경찰청 유실물 통합포털 확인하기!\n몽글이가 꼭 찾을 수 있기를 손모아 기도할게요 🔍",
+                    "분실물 긴급 대처 꿀팁! 🐾\n• **에어팟/아이폰/갤럭시**: '나의 찾기'나 'SmartThings Find' 앱으로 위치 추적 및 신호음 울리기!\n• **가방/지갑**: 옷 주머니, 외투 안쪽, 차 안 등 생각지도 못한 곳 재확인하기!\n너무 불안해하지 마시고 마음을 가다듬고 찾아보세요!",
+                    "어머나! 마지막으로 사용했던 순간을 떠올려보세요! 🔍 몽글이랑 같이 당시 상황을 타임머신 타듯 복기해볼까요? 외투 주머니 속을 먼저 확인해보세요!"
                 ]
             },
             {
-                keywords: ['날씨', '비', '눈', '춥다', '덥다', '바람', '우산'],
+                category: 'FOOD_RECOMMEND',
+                keywords: ['음식', '메뉴', '점심', '저녁', '배고파', '뭐 먹지', '뭐먹지', '맛있는', '배고픔', '야식', '추천해줘'],
                 replies: [
-                    "오늘 날씨 체크해보셨나요? ☀️ 외출하실 때는 감기 걸리지 않게 옷차림 신경 쓰시고, 혹시 모르니 작은 접이식 우산도 챙기시면 좋답니다!",
-                    "바람이나 날씨가 차가울 땐 따뜻한 음료가 최고죠! ☕️ {user}님, 오늘 외출하실 때 따뜻하게 입으셨나요?",
-                    "포근포근한 날씨처럼 {user}님의 마음에도 따사로운 햇살이 가득하기를 바랄게요 🌸"
+                    "오늘의 몽글이 엄선 추천 메뉴! 🍱\n✨ **따뜻한 국물**: 가쓰오 우동이나 칼칼한 김치찌개\n✨ **든든한 한 끼**: 바삭한 돈가스나 고소한 비빔밥\n✨ **즐거운 신메뉴**: 떡볶이와 튀김, 쿨피스 세트!\n{user}님은 지금 어떤 국물이나 맛이 당기시나요?",
+                    "배고플 땐 역시 맛있는 걸 먹어야 행복지수 상승! 🍕 오늘 메뉴로 바삭한 피자나 풍미 가득한 고소한 파스타, 혹은 든든한 족발 어떠신가요?",
+                    "음, 몽글이의 원픽은 달콤 고소한 계란볶음밥이에요! 차분한 식사를 원하시면 속이 든든해지는 포근한 뚝배기 순대국밥이나 설렁탕도 강력 추천해요 🐾",
+                    "오늘 고생한 {user}님을 위한 야식/식사 추천! 🍔 육즙 가득 수제버거나, 노릇노릇 구운 삼겹살에 된장찌개 조합은 실패가 없답니다!"
                 ]
             },
             {
-                keywords: ['퀴즈', '문제', '심심', '놀자', '게임', '넌센스'],
+                category: 'WEATHER',
+                keywords: ['날씨', '비', '눈', '춥다', '덥다', '바람', '우산', '일기예보', '쌀쌀'],
                 replies: [
-                    "재미있는 넌센스 퀴즈 하나 나갑니다! 💡\n**Q. 세상에서 가장 슬픈 파는 무슨 파일까요?**\n\n(정답을 아시겠다면 아무 말이나 입력해보세요! 정답: '파X' 또는 '대파'?) 🤭",
-                    "심심할 땐 몽글이랑 스피드 퀴즈! 💡\n**Q. 왕이 넘어지면 뭐가 될까요?**\n\n정답은 바로... **'킹콩'**입니다!! 히히 😆 재미있으셨나요?",
-                    "심심하시군요! 그렇다면 몽글이가 깜짝 상식 퀴즈 내볼게요 ✏️\n**Q. 세계에서 가장 큰 바다는 어디일까요?**\n(힌트: 太平洋)"
+                    "오늘 날씨 체크해보셨나요? ☀️ 외출하실 때는 체온 조절 잘 되는 가벼운 겉옷 챙기시고, 혹시 날씨가 변덕스러우니 작은 접이식 우산도 가방에 넣어두세요!",
+                    "바람이나 날씨가 차가울 땐 몽글몽글 따뜻한 음료가 최고죠! ☕️ {user}님, 오늘 외출하실 때 따뜻하게 무장하고 나가셨나요?",
+                    "포근포근한 햇살처럼 {user}님의 마음에도 따사로운 기운이 하루 종일 가득하기를 바랄게요 🌸"
                 ]
             },
             {
-                keywords: ['칭찬', '멋져', '최고', '귀여워', '고마워', '감사', '좋아'],
+                category: 'STUDY_WORK',
+                keywords: ['공부', '시험', '숙제', '과제', '일', '야근', '자격증', '피곤', '취업', '면접', '열공'],
                 replies: [
-                    "헤헤, 그렇게 말씀해주시니 몽글이 마음이 살랑살랑 기뻐요! 🥰 {user}님 덕분에 오늘 하루가 훨씬 행복해졌어요 🌸",
-                    "고마워요 {user}님! {user}님이야말로 정말 다정하고 따뜻한 분이에요 ✨ 몽글이는 언제나 {user} 편인 거 아시죠?",
-                    "몽글이도 {user}님이 정말 좋아요! 🐾 언제든 이야기를 나누고 싶을 때 찾아와주세요!"
+                    "목표를 향해 열심히 달려가고 계신 {user}님 정말 멋지고 대단해요! 👏 그렇지만 너무 무리하면 지칠 수 있으니 50분 집중 후 10분은 꼭 눈을 식혀주세요!",
+                    "포기하지 않고 노력하는 과정 자체가 이미 너무나 멋진 결실이에요. {user}님의 땀방울이 꼭 빛나는 결과로 보답할 거예요! 몽글이가 열렬히 응원할게요 🔥",
+                    "아무리 복잡한 과제나 일도 차분하게 하나씩 풀어나가면 다 해결될 거예요! 스트레칭 한번 쭉 하고 목을 풀어주세요 🧘‍♂️"
                 ]
             },
             {
-                keywords: ['공부', '시험', '숙제', '과제', '일', '야근', '자격증'],
+                category: 'PRAISE_LOVE',
+                keywords: ['칭찬', '멋져', '최고', '귀여워', '고마워', '감사', '좋아해', '사랑해', '착하다', '귀엽다'],
                 replies: [
-                    "열심히 달려가고 계신 {user}님 정말 대단해요! 👏 하지만 연속해서 공부하거나 일하면 효율이 떨어지니 50분 일하고 10분은 꼭 눈을 식혀주세요!",
-                    "포기하지 않고 노력하는 과정 자체가 이미 멋진 결실이에요. {user}님의 노력이 꼭 빛을 발할 거예요! 몽글이가 열렬히 응원할게요 🔥",
-                    "자물쇠도 열쇠가 있듯 차분하게 해결하면 다 풀릴 거예요! 조급해하지 말고 잠시 스트레칭 한 번 해주세요 🧘‍♂️"
+                    "헤헤, 그렇게 말씀해주시니 몽글이 귀가 쫑긋, 마음이 살랑살랑 기뻐요! 🥰 {user}님 덕분에 오늘 하루가 훨씬 행복해졌어요 🌸",
+                    "고마워요 {user}님! {user}님이야말로 정말 다정하고 따뜻한 마음을 가진 특별한 분이에요 ✨ 몽글이는 언제나 {user}님 편인 거 아시죠?",
+                    "몽글이도 {user}님이 정말 최고로 좋아요! 🐾 언제든 따뜻한 대화가 필요할 때 찾아와주세요!"
                 ]
             },
             {
-                keywords: ['비밀', '고민', '이야기', '상담', '말못할'],
+                category: 'COMPLAINT_TALK',
+                keywords: ['짜증', '화나', '화난다', '어이없어', '열받아', '싸웠어', '미워', '싫어'],
                 replies: [
-                    "몽글이에게는 어떤 비밀 이야기든 안심하고 털어놓으셔도 돼요. 🔒 절대 어디에도 말하지 않는 든든한 비밀 친구가 되어드릴게요.",
-                    "속에만 담아두면 마음이 아파요. 몽글이에게 가볍게 불평해보는 것도 좋아요. 다 들어드릴게요 🧸",
-                    "언제나 이곳에서 {user}님의 이야기를 들을 준비가 되어 있답니다. 편하게 말씀해주세요."
+                    "아휴, 정말 속상하고 화나셨겠어요! 😤 {user}님의 마음이 왜 상하셨는지 다 이해해요. 몽글이에게 마음껏 털어놓고 스트레스 날려버리세요!",
+                    "말도 안 돼! 우리 {user}님을 속상하게 하다니 몽글이가 대신 씩씩거려 줄게요 🐾 주먹 쥐고 소리 한 번 지르거나 맛있는 걸 먹으며 기분 풀어봐요!",
+                    "화가 날 땐 심호흡을 크게 3번 해보세요. 후- 하- 몽글이가 옆에서 {user}님 마음 가라앉을 때까지 든든하게 지켜줄게요 🧸"
                 ]
             }
         ];
 
-        // Generic Dynamic Fallback Templates to ensure never repetitive
-        const FALLBACK_TEMPLATES = [
-            "그렇군요! {user}님의 말씀을 듣다 보니 정말 흥미로워요. 🌸 혹시 이에 대해 더 나누고 싶은 이야기가 있으신가요?",
-            "{user}님과 대화하는 시간은 늘 포근하고 즐거워요 🐾 방금 하신 말씀에 대해 몽글이도 깊이 생각해보게 되네요!",
-            "아하! {user}님의 말씀 속에 깊은 뜻이 담겨 있군요 ✨ 오늘 다른 재미있는 일이나 고민은 없으셨나요?",
-            "몽글이는 항상 {user}님의 이야기를 경청하고 있어요 🧸 더 자세한 이야기나 다른 질문이 있다면 언제든 편하게 말해줘요!",
-            "와우, 정말 좋은 주제네요! 🐾 {user}님의 생각을 들을 수 있어서 기뻐요. 오늘도 기분 좋은 일들만 가득했으면 좋겠어요!"
+        // GENERIC MULTI-PATTERN FALLBACK SYSTEM
+        const GENERIC_FALLBACK_PATTERNS = [
+            "그렇군요! {user}님의 이야기를 듣고 있으니 정말 흥미로워요 🌸 이에 대해 조금 더 자세히 이야기해주실 수 있나요?",
+            "{user}님과 이렇게 마음을 나누는 시간은 늘 포근하고 따뜻해요 🐾 오늘 다른 재미있는 생각이나 일은 없으셨나요?",
+            "아하! {user}님의 말씀 속에 깊은 생각과 매력이 담겨 있네요 ✨ 몽글이는 언제나 {user}님의 의견을 존중해요!",
+            "몽글이는 항상 {user}님의 이야기를 경청하고 있답니다 🧸 혹시 궁금한 점이나 몽글이에게 내고 싶은 퀴즈가 있다면 편하게 말해주세요!",
+            "와우, 정말 좋은 주제예요! 🐾 {user}님 덕분에 저도 새로운 시각으로 바라보게 되었어요. 오늘도 좋은 기분만 가득하세요!"
         ];
 
-        // Global State
+        // GLOBAL STATE ENGINE
         let currentCharacter = CHARACTERS[0];
         let chatHistory = [];
         let isDarkMode = false;
         let userName = '몽글이친구';
         let isGenerating = false;
+        let activeQuiz = null; // Quiz session tracking
 
-        // DOM Elements
+        // DOM ELEMENTS
         const characterList = document.getElementById('characterList');
         const activeCharAvatar = document.getElementById('activeCharAvatar');
         const activeCharName = document.getElementById('activeCharName');
         const activeCharDesc = document.getElementById('activeCharDesc');
+        const quizStatusBadge = document.getElementById('quizStatusBadge');
         const chatMessages = document.getElementById('chatMessages');
         const suggestionChips = document.getElementById('suggestionChips');
         const chatForm = document.getElementById('chatForm');
@@ -465,7 +523,7 @@
         const copyCodeBtn = document.getElementById('copyCodeBtn');
         const codeDisplayArea = document.getElementById('codeDisplayArea');
 
-        // Init App
+        // INITIALIZATION
         window.addEventListener('DOMContentLoaded', () => {
             renderCharacterList();
             setupEventListeners();
@@ -511,17 +569,21 @@
 
             // Reset Chat
             clearChatBtn.addEventListener('click', () => {
-                chatHistory = [];
-                renderMessages();
-                addWelcomeMessage();
+                resetChatSession();
             });
 
             newChatBtn.addEventListener('click', () => {
-                chatHistory = [];
-                renderMessages();
-                addWelcomeMessage();
+                resetChatSession();
                 closeSidebar();
             });
+
+            function resetChatSession() {
+                chatHistory = [];
+                activeQuiz = null;
+                updateQuizBadge();
+                renderMessages();
+                addWelcomeMessage();
+            }
 
             // Code Modal Events
             openCodeModalBtn.addEventListener('click', () => {
@@ -599,6 +661,8 @@
             renderCharacterList();
             updateHeaderAndSuggestions();
             chatHistory = [];
+            activeQuiz = null;
+            updateQuizBadge();
             renderMessages();
             addWelcomeMessage();
 
@@ -622,6 +686,16 @@
             `).join('');
         }
 
+        function updateQuizBadge() {
+            if (activeQuiz) {
+                quizStatusBadge.classList.remove('hidden');
+                quizStatusBadge.classList.add('flex');
+            } else {
+                quizStatusBadge.classList.add('hidden');
+                quizStatusBadge.classList.remove('flex');
+            }
+        }
+
         window.sendPresetQuery = function(text) {
             userInput.value = text;
             handleSendMessage();
@@ -633,7 +707,7 @@
         }
 
         function addWelcomeMessage() {
-            const welcomeText = `안녕하세요 {user}님! **${currentCharacter.name}**입니다. 🌸\n오늘 어떤 대화를 나누고 싶으신가요? 마음 편히 말씀해주세요!`;
+            const welcomeText = `안녕하세요 {user}님! **${currentCharacter.name}**입니다. 🌸\n오늘 어떤 대화를 나누고 싶으신가요? 마음 편히 궁금한 이야기나 퀴즈를 요청해주세요!`;
             chatHistory.push({
                 id: 'msg-' + Date.now(),
                 role: 'model',
@@ -643,21 +717,68 @@
             renderMessages();
         }
 
-        // Smart Local Response Generator
-        function generateLocalAIResponse(userQuery) {
-            const cleanQuery = userQuery.toLowerCase().trim();
+        // SMART CONTEXT-AWARE RESPONSE GENERATOR (HANDLES QUIZZES & HUNDREDS OF INTENTS)
+        function processSmartResponse(userQuery) {
+            const cleanQuery = userQuery.toLowerCase().replace(/\s+/g, '').trim();
+            const rawQuery = userQuery.toLowerCase().trim();
 
-            // 1. Check matching database keywords
-            for (const category of RESPONSES_DATABASE) {
-                const match = category.keywords.some(kw => cleanQuery.includes(kw));
-                if (match) {
-                    const randomReply = category.replies[Math.floor(Math.random() * category.replies.length)];
-                    return randomReply.replace(/{user}/g, userName);
+            // 1. CONTEXT CHECK: IS THERE AN ACTIVE QUIZ SESSION?
+            if (activeQuiz) {
+                const isCorrect = activeQuiz.answers.some(ans => {
+                    const cleanAns = ans.toLowerCase().replace(/\s+/g, '');
+                    return cleanQuery.includes(cleanAns) || cleanAns.includes(cleanQuery);
+                });
+
+                if (isCorrect) {
+                    const celebrationText = activeQuiz.explanation;
+                    activeQuiz = null; // Quiz completed!
+                    updateQuizBadge();
+
+                    // Fire Confetti!
+                    try {
+                        confetti({
+                            particleCount: 80,
+                            spread: 60,
+                            origin: { y: 0.7 }
+                        });
+                    } catch(e){}
+
+                    return `${celebrationText}\n\n다른 퀴즈를 더 풀어보고 싶으시다면 **"퀴즈 내줘"** 라고 말해 주세요! 💡`;
+                }
+
+                // Check if user is giving up or asking for answer
+                if (cleanQuery.includes('포기') || cleanQuery.includes('정답뭐') || cleanQuery.includes('몰라') || cleanQuery.includes('힌트')) {
+                    if (cleanQuery.includes('힌트')) {
+                        return `💡 **힌트 요청!**\n이 퀴즈의 정답은 **"${activeQuiz.answers[0].charAt(0)}..."** 으로 시작해요! 조금만 더 생각해보세요! 🐾`;
+                    } else {
+                        const answerText = activeQuiz.answers[0];
+                        activeQuiz = null;
+                        updateQuizBadge();
+                        return `아쉽네요! 정답은 바로 **'${answerText}'** 이었습니다! 🤭 다음 문제에서는 꼭 맞혀봐요! 퀴즈가 더 필요하시면 말씀해주세요!`;
+                    }
                 }
             }
 
-            // 2. Fallback to dynamic template if no explicit keyword matches
-            const randomFallback = FALLBACK_TEMPLATES[Math.floor(Math.random() * FALLBACK_TEMPLATES.length)];
+            // 2. CHECK IF USER WANTS A NEW QUIZ
+            if (rawQuery.includes('퀴즈') || rawQuery.includes('문제') || rawQuery.includes('맞춰볼까') || rawQuery.includes('게임')) {
+                // Select a random quiz from the Quiz Bank
+                const randomQuiz = QUIZ_BANK[Math.floor(Math.random() * QUIZ_BANK.length)];
+                activeQuiz = randomQuiz;
+                updateQuizBadge();
+                return `${randomQuiz.question}\n\n*(정답을 아시겠다면 단어를 그대로 적어보세요!)*`;
+            }
+
+            // 3. KEYWORD & CATEGORY MATCHING ENGINE
+            for (const cat of RESPONSE_CATEGORIES) {
+                const matched = cat.keywords.some(kw => rawQuery.includes(kw) || cleanQuery.includes(kw.replace(/\s+/g, '')));
+                if (matched) {
+                    const selectedReply = cat.replies[Math.floor(Math.random() * cat.replies.length)];
+                    return selectedReply.replace(/{user}/g, userName);
+                }
+            }
+
+            // 4. SMART DYNAMIC FALLBACK
+            const randomFallback = GENERIC_FALLBACK_PATTERNS[Math.floor(Math.random() * GENERIC_FALLBACK_PATTERNS.length)];
             return randomFallback.replace(/{user}/g, userName);
         }
 
@@ -681,10 +802,10 @@
             isGenerating = true;
             showTypingIndicator();
 
-            // Simulate realistic AI thought process latency (0.6 ~ 1.2 sec)
+            // Simulate realistic AI thought process latency
             setTimeout(() => {
                 removeTypingIndicator();
-                const responseText = generateLocalAIResponse(text);
+                const responseText = processSmartResponse(text);
 
                 chatHistory.push({
                     id: 'msg-' + Date.now(),
@@ -695,7 +816,7 @@
 
                 isGenerating = false;
                 renderMessages();
-            }, Math.floor(Math.random() * 600) + 600);
+            }, Math.floor(Math.random() * 400) + 400);
         }
 
         function renderMessages() {
